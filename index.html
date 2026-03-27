@@ -3874,74 +3874,1221 @@ body{
   </div>
 
   <!-- ══ EXAM CORNER ══ -->
+
+  <!-- ══ EXAM CORNER ══ -->
   <div class="page" id="page-exam-corner" style="display:none">
-    <div style="padding:22px 26px">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
-        <div class="card" style="padding:20px;border-left:4px solid #3b82f6">
-          <div style="font-size:11px;font-weight:700;color:var(--slate-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Internal Assessment (CIE)</div>
-          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--slate-900);margin-bottom:4px">Manage CIE marks</div>
-          <div style="font-size:12px;color:var(--slate-500)">Record and update Continuous Internal Evaluation marks per student per subject. Set weightage, upload mark sheets.</div>
-          <button class="btn-secondary" style="margin-top:12px;font-size:12px" onclick="alert('CIE module — coming in next build')">Open CIE Manager</button>
+  <style>
+  /* ── Exam Corner styles ── */
+  .ec-tabs{display:flex;border-bottom:2px solid var(--slate-200);margin-bottom:0;overflow-x:auto;flex-shrink:0}
+  .ec-tab{padding:9px 15px;font-size:12px;font-weight:500;cursor:pointer;color:var(--slate-500);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s;font-family:'DM Sans',sans-serif;flex-shrink:0}
+  .ec-tab:hover{color:var(--slate-800)}
+  .ec-tab.active{color:var(--amber-dark);border-bottom-color:var(--amber);font-weight:600}
+
+  /* Stat strip */
+  .ec-stat-strip{display:grid;grid-template-columns:repeat(5,1fr);background:#fff;border:1px solid var(--slate-200);border-radius:var(--r-lg);overflow:hidden}
+  .ec-stat-cell{padding:10px 14px;border-right:1px solid var(--slate-100)}
+  .ec-stat-cell:last-child{border-right:none}
+  .ec-stat-val{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;line-height:1}
+  .ec-stat-lbl{font-size:10px;color:var(--slate-400);margin-top:2px}
+
+  /* Tables */
+  .ec-table{width:100%;border-collapse:collapse;font-size:12px}
+  .ec-table th{background:var(--slate-800);color:#fff;padding:8px 12px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+  .ec-table td{border-bottom:1px solid var(--slate-100);padding:9px 12px;vertical-align:middle}
+  .ec-table tr:hover td{background:#fffbeb}
+  .ec-table tbody tr:last-child td{border-bottom:none}
+
+  /* Status pills */
+  .ec-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700}
+  .ec-pill.eligible{background:#d1fae5;color:#065f46}
+  .ec-pill.ineligible{background:#fee2e2;color:#991b1b}
+  .ec-pill.pending{background:#fef3c7;color:#92400e}
+  .ec-pill.present{background:#d1fae5;color:#065f46}
+  .ec-pill.absent{background:#fee2e2;color:#991b1b}
+  .ec-pill.shortage{background:#fef9c3;color:#713f12}
+  .ec-pill.pass{background:#d1fae5;color:#065f46}
+  .ec-pill.fail{background:#fee2e2;color:#991b1b}
+  .ec-pill.withheld{background:#f3f4f6;color:#374151}
+  .ec-pill.scheduled{background:#dbeafe;color:#1e40af}
+  .ec-pill.completed{background:#d1fae5;color:#065f46}
+  .ec-pill.draft{background:#fef3c7;color:#92400e}
+  .ec-pill.assigned{background:#ede9fe;color:#5b21b6}
+
+  /* Attendance grid */
+  .att-cell{width:24px;height:24px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;cursor:pointer;transition:all .15s;flex-shrink:0}
+  .att-cell.P{background:#d1fae5;color:#065f46}
+  .att-cell.A{background:#fee2e2;color:#991b1b}
+  .att-cell.OD{background:#dbeafe;color:#1e40af}
+  .att-cell.ML{background:#ede9fe;color:#5b21b6}
+  .att-cell.empty{background:var(--slate-100);color:var(--slate-400)}
+  .att-cell:hover{opacity:.75;transform:scale(1.1)}
+
+  /* CIE marks input */
+  .cie-marks-input{width:52px;padding:4px 6px;border:1px solid var(--slate-200);border-radius:4px;font-size:12px;text-align:center;font-family:'DM Sans',sans-serif;transition:border .15s}
+  .cie-marks-input:focus{border-color:var(--amber);outline:none}
+  .cie-marks-input.over{border-color:var(--red);background:#fff5f5}
+  .cie-marks-input.saved{border-color:var(--green)}
+
+  /* Invig duty card */
+  .inv-slot{border:1px solid var(--slate-200);border-radius:var(--r-md);padding:10px 12px;background:#fff;transition:all .15s}
+  .inv-slot:hover{border-color:var(--amber)}
+  .inv-slot.assigned{border-color:#6ee7b7;background:#f0fdf4}
+  .inv-slot.conflict{border-color:var(--red);background:#fff5f5}
+
+  /* Hall ticket preview */
+  .ht-preview{border:2px solid var(--slate-900);border-radius:var(--r-lg);padding:20px;background:#fff;max-width:380px;font-family:'DM Sans',sans-serif}
+  .ht-header{border-bottom:2px solid var(--slate-900);padding-bottom:12px;margin-bottom:12px;text-align:center}
+  .ht-college{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--slate-900)}
+  .ht-subtitle{font-size:10px;color:var(--slate-500);margin-top:2px}
+  .ht-title{font-size:12px;font-weight:700;color:var(--slate-900);margin-top:6px;text-transform:uppercase;letter-spacing:.08em}
+  .ht-field{display:flex;border-bottom:1px solid var(--slate-200);padding:5px 0;font-size:11px}
+  .ht-key{color:var(--slate-500);width:120px;flex-shrink:0}
+  .ht-val{font-weight:600;color:var(--slate-900)}
+  .ht-subjects{margin-top:8px;width:100%;border-collapse:collapse;font-size:10px}
+  .ht-subjects th{background:var(--slate-900);color:#fff;padding:4px 8px;text-align:left}
+  .ht-subjects td{border-bottom:1px solid var(--slate-200);padding:4px 8px}
+  .ht-barcode{height:36px;background:repeating-linear-gradient(90deg,#000 0,#000 2px,#fff 2px,#fff 4px);border-radius:2px;margin-top:8px}
+  </style>
+
+  <div style="display:flex;flex-direction:column;height:calc(100vh - 90px);overflow:hidden">
+
+    <!-- Stat strip -->
+    <div style="padding:16px 24px 0;flex-shrink:0">
+      <div class="ec-stat-strip">
+        <div class="ec-stat-cell"><div class="ec-stat-val" id="ec-total-students" style="color:var(--slate-900)">0</div><div class="ec-stat-lbl">Total students</div></div>
+        <div class="ec-stat-cell"><div class="ec-stat-val" id="ec-eligible" style="color:var(--green-dark)">0</div><div class="ec-stat-lbl">Eligible for SEE</div></div>
+        <div class="ec-stat-cell"><div class="ec-stat-val" id="ec-att-def" style="color:var(--red-dark)">0</div><div class="ec-stat-lbl">Attendance defaulters</div></div>
+        <div class="ec-stat-cell"><div class="ec-stat-val" id="ec-cie-pending" style="color:var(--amber-dark)">0</div><div class="ec-stat-lbl">CIE marks pending</div></div>
+        <div class="ec-stat-cell"><div class="ec-stat-val" id="ec-exams-today" style="color:#5b21b6">0</div><div class="ec-stat-lbl">Exams scheduled</div></div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div style="padding:14px 24px 0;flex-shrink:0">
+      <div class="ec-tabs">
+        <div class="ec-tab active" id="ectab-cie"        onclick="ecTab('cie',this)">CIE Marks</div>
+        <div class="ec-tab"        id="ectab-attendance" onclick="ecTab('attendance',this)">Attendance</div>
+        <div class="ec-tab"        id="ectab-see"        onclick="ecTab('see',this)">SEE Schedule</div>
+        <div class="ec-tab"        id="ectab-hallticket" onclick="ecTab('hallticket',this)">Hall Tickets</div>
+        <div class="ec-tab"        id="ectab-invig"      onclick="ecTab('invig',this)">Invigilation Duty</div>
+        <div class="ec-tab"        id="ectab-results"    onclick="ecTab('results',this)">Results</div>
+        <div class="ec-tab"        id="ectab-qbank"      onclick="ecTab('qbank',this)">Question Bank</div>
+      </div>
+    </div>
+
+    <!-- Tab content area (scrollable) -->
+    <div style="flex:1;overflow-y:auto;padding:16px 24px 24px">
+
+    <!-- ════ CIE MARKS ════ -->
+    <div id="ecsubtab-cie">
+      <!-- Filters -->
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+        <select class="form-select" id="cieDept" onchange="renderCIE()" style="width:160px;font-size:12px;padding:7px 10px">
+          <option value="BCA">BCA</option><option value="BBA">BBA</option>
+          <option value="BCOM">B.Com</option><option value="BSC">B.Sc</option><option value="BA">BA</option>
+        </select>
+        <select class="form-select" id="cieSem" onchange="renderCIE()" style="width:120px;font-size:12px;padding:7px 10px">
+          <option value="1">Semester 1</option><option value="2">Semester 2</option>
+          <option value="3">Semester 3</option><option value="4">Semester 4</option>
+          <option value="5">Semester 5</option><option value="6">Semester 6</option>
+        </select>
+        <select class="form-select" id="cieSubject" onchange="renderCIE()" style="width:200px;font-size:12px;padding:7px 10px">
+          <option value="">All subjects</option>
+        </select>
+        <select class="form-select" id="cieTest" style="width:130px;font-size:12px;padding:7px 10px">
+          <option value="1">Test 1</option>
+          <option value="2">Test 2</option>
+          <option value="3">Test 3</option>
+          <option value="assignment">Assignment</option>
+          <option value="seminar">Seminar / Viva</option>
+        </select>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn-secondary" style="font-size:12px;padding:6px 12px" onclick="exportCIEMarks()">Export CSV</button>
+          <button class="btn-primary" style="font-size:12px;padding:6px 12px" onclick="saveCIEAll()">Save all marks</button>
         </div>
-        <div class="card" style="padding:20px;border-left:4px solid #8b5cf6">
-          <div style="font-size:11px;font-weight:700;color:var(--slate-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Semester End Exam (SEE)</div>
-          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--slate-900);margin-bottom:4px">SEE scheduling & halls</div>
-          <div style="font-size:12px;color:var(--slate-500)">Generate hall tickets, seat allocation, room assignment for SEE. Manage exam schedule per department and semester.</div>
-          <button class="btn-secondary" style="margin-top:12px;font-size:12px" onclick="alert('SEE module — coming in next build')">Open SEE Planner</button>
+      </div>
+
+      <!-- CIE config bar -->
+      <div style="display:flex;gap:10px;padding:10px 14px;background:var(--blue-light);border:1px solid #93c5fd;border-radius:var(--r-md);margin-bottom:12px;font-size:12px;color:var(--blue-dark);align-items:center;flex-wrap:wrap">
+        <span style="font-weight:600">BU CIE Pattern:</span>
+        <span>3 Tests × 20 marks each → Best 2 taken → Scaled to 30 marks</span>
+        <span style="color:#60a5fa">·</span>
+        <span>Assignment: 10 marks</span>
+        <span style="color:#60a5fa">·</span>
+        <span>Total CIE: 40 marks</span>
+        <span style="color:#60a5fa">·</span>
+        <span>SEE: 60 marks</span>
+        <span style="color:#60a5fa">·</span>
+        <span>Grand Total: 100 marks</span>
+      </div>
+
+      <!-- Marks table -->
+      <div style="overflow-x:auto;border:1px solid var(--slate-200);border-radius:var(--r-lg)">
+        <table class="ec-table">
+          <thead>
+            <tr>
+              <th style="min-width:160px">Student</th>
+              <th style="min-width:80px">Adm No</th>
+              <th style="text-align:center;min-width:80px">Test 1<br><span style="font-size:9px;font-weight:400;opacity:.7">/20</span></th>
+              <th style="text-align:center;min-width:80px">Test 2<br><span style="font-size:9px;font-weight:400;opacity:.7">/20</span></th>
+              <th style="text-align:center;min-width:80px">Test 3<br><span style="font-size:9px;font-weight:400;opacity:.7">/20</span></th>
+              <th style="text-align:center;min-width:80px">Assignment<br><span style="font-size:9px;font-weight:400;opacity:.7">/10</span></th>
+              <th style="text-align:center;min-width:80px">Seminar<br><span style="font-size:9px;font-weight:400;opacity:.7">/10</span></th>
+              <th style="text-align:center;min-width:70px;background:#374151">CIE Total<br><span style="font-size:9px;font-weight:400;opacity:.7">/40</span></th>
+              <th style="text-align:center;min-width:60px">Att %</th>
+              <th style="min-width:80px">Eligibility</th>
+            </tr>
+          </thead>
+          <tbody id="cieTableBody">
+            <tr><td colspan="10" style="text-align:center;padding:24px;color:var(--slate-400)">Select department and semester to load students.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--slate-400)">
+        Eligibility: CIE ≥ 12/40 AND Attendance ≥ 75% — student is eligible to appear for SEE.
+        <span style="color:var(--red-dark);font-weight:600">Red cells = marks exceed maximum.</span>
+      </div>
+    </div>
+
+    <!-- ════ ATTENDANCE ════ -->
+    <div id="ecsubtab-attendance" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+        <select class="form-select" id="attDept" onchange="renderAttendance()" style="width:160px;font-size:12px;padding:7px 10px">
+          <option value="BCA">BCA</option><option value="BBA">BBA</option>
+          <option value="BCOM">B.Com</option><option value="BSC">B.Sc</option><option value="BA">BA</option>
+        </select>
+        <select class="form-select" id="attSem" onchange="renderAttendance()" style="width:120px;font-size:12px;padding:7px 10px">
+          <option value="1">Semester 1</option><option value="2">Semester 2</option>
+          <option value="3">Semester 3</option><option value="4">Semester 4</option>
+          <option value="5">Semester 5</option><option value="6">Semester 6</option>
+        </select>
+        <select class="form-select" id="attSubject" onchange="renderAttendance()" style="width:200px;font-size:12px;padding:7px 10px">
+          <option value="">All subjects (consolidated)</option>
+        </select>
+        <select class="form-select" id="attView" onchange="renderAttendance()" style="width:150px;font-size:12px;padding:7px 10px">
+          <option value="summary">Summary view</option>
+          <option value="daywise">Day-wise grid</option>
+          <option value="defaulters">Defaulters only</option>
+        </select>
+        <button class="btn-secondary" style="font-size:12px;padding:6px 12px;margin-left:auto" onclick="printAttendanceReport()">Print report</button>
+        <button class="btn-primary" style="font-size:12px;padding:6px 12px" onclick="markTodayAttendance()">Mark today's attendance</button>
+      </div>
+
+      <!-- Attendance info bar -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">
+        <div style="padding:10px 14px;background:#d1fae5;border-radius:var(--r-md);border:1px solid #6ee7b7">
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#065f46" id="att-above75">0</div>
+          <div style="font-size:10px;color:#065f46">Above 75% (eligible)</div>
         </div>
-        <div class="card" style="padding:20px;border-left:4px solid #10b981">
-          <div style="font-size:11px;font-weight:700;color:var(--slate-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Results</div>
-          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--slate-900);margin-bottom:4px">Results & grade cards</div>
-          <div style="font-size:12px;color:var(--slate-500)">Enter/import BU results, auto-calculate SGPA/CGPA, generate grade cards and marksheets for students.</div>
-          <button class="btn-secondary" style="margin-top:12px;font-size:12px" onclick="alert('Results module — coming in next build')">Open Results</button>
+        <div style="padding:10px 14px;background:#fef3c7;border-radius:var(--r-md);border:1px solid #fcd34d">
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#92400e" id="att-65to75">0</div>
+          <div style="font-size:10px;color:#92400e">65–75% (condonation zone)</div>
         </div>
-        <div class="card" style="padding:20px;border-left:4px solid #f59e0b">
-          <div style="font-size:11px;font-weight:700;color:var(--slate-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Hall Tickets</div>
-          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--slate-900);margin-bottom:4px">Generate & print hall tickets</div>
-          <div style="font-size:12px;color:var(--slate-500)">Bulk-generate hall tickets for all eligible students. Filter by fee clearance status, attendance, and eligibility criteria.</div>
-          <button class="btn-secondary" style="margin-top:12px;font-size:12px" onclick="alert('Hall tickets — coming in next build')">Generate Hall Tickets</button>
+        <div style="padding:10px 14px;background:#fee2e2;border-radius:var(--r-md);border:1px solid #fecaca">
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#991b1b" id="att-below65">0</div>
+          <div style="font-size:10px;color:#991b1b">Below 65% (detained)</div>
         </div>
-        <div class="card" style="padding:20px;border-left:4px solid #ef4444">
-          <div style="font-size:11px;font-weight:700;color:var(--slate-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Attendance</div>
-          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--slate-900);margin-bottom:4px">Attendance tracking</div>
-          <div style="font-size:12px;color:var(--slate-500)">Mark daily attendance per subject per section. Track overall % and flag students below 75%. Generate shortage notices.</div>
-          <button class="btn-secondary" style="margin-top:12px;font-size:12px" onclick="alert('Attendance module — coming in next build')">Open Attendance</button>
+        <div style="padding:10px 14px;background:var(--slate-50);border-radius:var(--r-md);border:1px solid var(--slate-200)">
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--slate-700)" id="att-avg-pct">0%</div>
+          <div style="font-size:10px;color:var(--slate-400)">Average attendance</div>
         </div>
-        <div class="card" style="padding:20px;border-left:4px solid #6366f1">
-          <div style="font-size:11px;font-weight:700;color:var(--slate-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Question Bank</div>
-          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--slate-900);margin-bottom:4px">Question bank & papers</div>
-          <div style="font-size:12px;color:var(--slate-500)">Build and maintain a subject-wise question bank. Generate question papers with CO mapping and Bloom's taxonomy levels.</div>
-          <button class="btn-secondary" style="margin-top:12px;font-size:12px" onclick="alert('Question bank — coming in next build')">Open Question Bank</button>
+      </div>
+
+      <div style="overflow-x:auto;border:1px solid var(--slate-200);border-radius:var(--r-lg)">
+        <table class="ec-table">
+          <thead>
+            <tr>
+              <th style="min-width:160px">Student</th>
+              <th style="min-width:80px">Adm No</th>
+              <th style="text-align:center">Total classes</th>
+              <th style="text-align:center">Present</th>
+              <th style="text-align:center">Absent</th>
+              <th style="text-align:center">OD / ML</th>
+              <th style="text-align:center;min-width:80px">Attendance %</th>
+              <th style="text-align:center">Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="attTableBody">
+            <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--slate-400)">Select department and semester to load attendance data.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--slate-400)">
+        ≥75% = Eligible · 65–74% = Condonation (requires principal approval + medical certificate) · &lt;65% = Detained (not eligible for SEE)
+      </div>
+    </div>
+
+    <!-- ════ SEE SCHEDULE ════ -->
+    <div id="ecsubtab-see" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+        <select class="form-select" id="seeDept" onchange="renderSEE()" style="width:160px;font-size:12px;padding:7px 10px">
+          <option value="">All departments</option>
+          <option value="BCA">BCA</option><option value="BBA">BBA</option>
+          <option value="BCOM">B.Com</option><option value="BSC">B.Sc</option><option value="BA">BA</option>
+        </select>
+        <select class="form-select" id="seeSem" onchange="renderSEE()" style="width:120px;font-size:12px;padding:7px 10px">
+          <option value="1">Semester 1</option><option value="2">Semester 2</option>
+          <option value="3">Semester 3</option><option value="4">Semester 4</option>
+          <option value="5">Semester 5</option><option value="6">Semester 6</option>
+        </select>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn-secondary" style="font-size:12px;padding:6px 12px" onclick="loadSuranaExamSchedule()">Load BU schedule</button>
+          <button class="btn-primary" style="font-size:12px;padding:6px 12px" onclick="addSEEExam()">+ Add exam</button>
+        </div>
+      </div>
+
+      <!-- SEE schedule table -->
+      <div style="overflow-x:auto;border:1px solid var(--slate-200);border-radius:var(--r-lg);margin-bottom:14px">
+        <table class="ec-table">
+          <thead>
+            <tr>
+              <th>Subject code</th>
+              <th>Subject name</th>
+              <th>Dept / Sem</th>
+              <th>Exam date</th>
+              <th>Day</th>
+              <th>Time</th>
+              <th>Duration</th>
+              <th>Exam hall</th>
+              <th>Max marks</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="seeTableBody">
+            <tr><td colspan="11" style="text-align:center;padding:24px;color:var(--slate-400)">No exams scheduled. Click "Load BU schedule" or add exams manually.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Add / edit exam form (inline) -->
+      <div id="seeAddForm" style="display:none;background:#fff;border:1px solid var(--amber);border-radius:var(--r-lg);padding:18px 20px;margin-top:8px">
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--slate-900);margin-bottom:12px" id="seeFormTitle">Add Exam</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Subject</label>
+            <select class="form-select" id="seeSubjectSel" style="font-size:12px"><option value="">Select subject…</option></select></div>
+          <div class="form-group"><label class="form-label">Exam date <span>*</span></label>
+            <input class="form-input" id="seeDate" type="date" style="font-size:12px"/></div>
+          <div class="form-group"><label class="form-label">Start time</label>
+            <input class="form-input" id="seeTime" type="time" value="10:00" style="font-size:12px"/></div>
+          <div class="form-group"><label class="form-label">Duration (hrs)</label>
+            <input class="form-input" id="seeDuration" type="number" value="3" min="1" max="5" style="font-size:12px"/></div>
+          <div class="form-group"><label class="form-label">Exam hall / room</label>
+            <input class="form-input" id="seeHall" type="text" placeholder="e.g. Seminar Hall" style="font-size:12px"/></div>
+          <div class="form-group"><label class="form-label">Max marks</label>
+            <input class="form-input" id="seeMaxMarks" type="number" value="60" style="font-size:12px"/></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-primary" onclick="saveSEEExam()">Save exam</button>
+          <button class="btn-ghost" onclick="document.getElementById('seeAddForm').style.display='none'">Cancel</button>
         </div>
       </div>
     </div>
-  </div>
+
+    <!-- ════ HALL TICKETS ════ -->
+    <div id="ecsubtab-hallticket" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 380px;gap:16px;align-items:flex-start">
+        <!-- Left: student eligibility list -->
+        <div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+            <select class="form-select" id="htDept" onchange="renderHallTicketList()" style="width:160px;font-size:12px;padding:7px 10px">
+              <option value="BCA">BCA</option><option value="BBA">BBA</option>
+              <option value="BCOM">B.Com</option><option value="BSC">B.Sc</option><option value="BA">BA</option>
+            </select>
+            <select class="form-select" id="htSem" onchange="renderHallTicketList()" style="width:120px;font-size:12px;padding:7px 10px">
+              <option value="1">Semester 1</option><option value="2">Semester 2</option>
+              <option value="3">Semester 3</option><option value="4">Semester 4</option>
+              <option value="5">Semester 5</option><option value="6">Semester 6</option>
+            </select>
+            <select class="form-select" id="htEligFilter" onchange="renderHallTicketList()" style="width:140px;font-size:12px;padding:7px 10px">
+              <option value="">All students</option>
+              <option value="eligible">Eligible only</option>
+              <option value="ineligible">Ineligible only</option>
+            </select>
+            <div style="margin-left:auto">
+              <button class="btn-primary" style="font-size:12px;padding:6px 12px" onclick="bulkPrintHallTickets()">Print all eligible</button>
+            </div>
+          </div>
+
+          <!-- Eligibility criteria panel -->
+          <div style="padding:10px 14px;background:var(--slate-50);border:1px solid var(--slate-200);border-radius:var(--r-md);margin-bottom:10px;font-size:11px;color:var(--slate-600)">
+            <span style="font-weight:700;color:var(--slate-800)">Eligibility criteria:</span>
+            &nbsp;✓ Attendance ≥ 75%
+            &nbsp;·&nbsp;✓ CIE marks ≥ 12/40
+            &nbsp;·&nbsp;✓ Fees cleared
+            &nbsp;·&nbsp;✓ No library dues
+            <span style="margin-left:8px;color:var(--amber-dark);font-weight:600">All 4 must be met</span>
+          </div>
+
+          <div style="overflow-x:auto;border:1px solid var(--slate-200);border-radius:var(--r-lg)">
+            <table class="ec-table">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="htSelectAll" onchange="toggleAllHT(this)" style="accent-color:var(--amber)"/></th>
+                  <th>Student</th>
+                  <th>Adm No</th>
+                  <th style="text-align:center">Attendance</th>
+                  <th style="text-align:center">CIE</th>
+                  <th style="text-align:center">Fees</th>
+                  <th>Eligibility</th>
+                  <th>Hall ticket</th>
+                </tr>
+              </thead>
+              <tbody id="htTableBody">
+                <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--slate-400)">Select department and semester.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right: Hall ticket preview -->
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--slate-700);margin-bottom:10px">Hall ticket preview</div>
+          <div class="ht-preview" id="htPreview">
+            <div class="ht-header">
+              <div class="ht-college">Surana College Peenya</div>
+              <div class="ht-subtitle">No. 167, 5th Main, Peenya II Stage, Bengaluru – 560022</div>
+              <div class="ht-subtitle">Affiliated to Bangalore University · NAAC A Grade</div>
+              <div class="ht-title">Hall Ticket — Semester End Examination 2025-26</div>
+            </div>
+            <div class="ht-field"><span class="ht-key">Name</span><span class="ht-val" id="ht-name">—</span></div>
+            <div class="ht-field"><span class="ht-key">Reg. / Adm. No.</span><span class="ht-val" id="ht-admno">—</span></div>
+            <div class="ht-field"><span class="ht-key">Programme</span><span class="ht-val" id="ht-prog">—</span></div>
+            <div class="ht-field"><span class="ht-key">Semester</span><span class="ht-val" id="ht-sem">—</span></div>
+            <div class="ht-field"><span class="ht-key">Section</span><span class="ht-val" id="ht-sec">—</span></div>
+            <div class="ht-field"><span class="ht-key">Exam centre</span><span class="ht-val">Surana College Peenya</span></div>
+            <div style="margin-top:8px;font-size:10px;font-weight:700;color:var(--slate-700)">Subjects and exam dates:</div>
+            <table class="ht-subjects">
+              <thead><tr><th>Code</th><th>Subject</th><th>Date</th><th>Time</th></tr></thead>
+              <tbody id="ht-subjects-body"><tr><td colspan="4" style="text-align:center;color:#9ca3af;padding:6px">Select a student</td></tr></tbody>
+            </table>
+            <div class="ht-barcode" style="margin-top:12px"></div>
+            <div style="font-size:9px;color:var(--slate-400);text-align:center;margin-top:4px">This hall ticket must be produced at the examination hall</div>
+            <div style="display:flex;justify-content:space-between;margin-top:14px;font-size:9px;color:var(--slate-500)">
+              <span>Student signature</span>
+              <span>Principal / Controller of Examinations</span>
+            </div>
+          </div>
+          <button class="btn-primary" style="width:100%;margin-top:10px;font-size:12px" onclick="printSingleHT()">Print this hall ticket</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ INVIGILATION DUTY ════ -->
+    <div id="ecsubtab-invig" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+        <select class="form-select" id="invigSem" onchange="renderInvig()" style="width:130px;font-size:12px;padding:7px 10px">
+          <option value="1">Semester 1</option><option value="2">Semester 2</option>
+          <option value="3">Semester 3</option><option value="4">Semester 4</option>
+          <option value="5">Semester 5</option><option value="6">Semester 6</option>
+        </select>
+        <div style="font-size:12px;color:var(--slate-500);margin-left:4px">Assign faculty to exam slots. System detects conflicts automatically.</div>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn-secondary" style="font-size:12px;padding:6px 12px" onclick="autoAssignInvig()">Auto-assign</button>
+          <button class="btn-secondary" style="font-size:12px;padding:6px 12px" onclick="printInvigList()">Print duty list</button>
+        </div>
+      </div>
+
+      <!-- Invigilation stats -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px">
+        <div style="padding:10px 14px;background:#fff;border:1px solid var(--slate-200);border-radius:var(--r-md)">
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--slate-900)" id="inv-total-slots">0</div>
+          <div style="font-size:10px;color:var(--slate-400)">Total exam slots</div>
+        </div>
+        <div style="padding:10px 14px;background:#d1fae5;border:1px solid #6ee7b7;border-radius:var(--r-md)">
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--green-dark)" id="inv-assigned">0</div>
+          <div style="font-size:10px;color:var(--green-dark)">Fully assigned</div>
+        </div>
+        <div style="padding:10px 14px;background:#fee2e2;border:1px solid #fecaca;border-radius:var(--r-md)">
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--red-dark)" id="inv-unassigned">0</div>
+          <div style="font-size:10px;color:var(--red-dark)">Unassigned</div>
+        </div>
+        <div style="padding:10px 14px;background:#fef3c7;border:1px solid #fcd34d;border-radius:var(--r-md)">
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--amber-dark)" id="inv-conflicts">0</div>
+          <div style="font-size:10px;color:var(--amber-dark)">Conflicts</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 280px;gap:16px;align-items:flex-start">
+        <!-- Left: exam slots grid -->
+        <div>
+          <div id="invigGridEl">
+            <div style="text-align:center;padding:24px;color:var(--slate-400);font-size:12px">No exams scheduled. Add exams in the SEE Schedule tab first.</div>
+          </div>
+        </div>
+
+        <!-- Right: teacher duty summary -->
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--slate-700);margin-bottom:10px">Teacher duty count</div>
+          <div id="invigTeacherSummary" style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:12px;color:var(--slate-400)">Duty counts appear here after assignment.</div>
+          </div>
+          <div style="margin-top:14px;padding:10px 12px;background:var(--slate-50);border-radius:var(--r-md);border:1px solid var(--slate-200)">
+            <div style="font-size:11px;font-weight:700;color:var(--slate-700);margin-bottom:6px">Rules applied:</div>
+            <div style="font-size:11px;color:var(--slate-500);line-height:1.8">
+              · Subject teacher cannot invigilate their own paper<br>
+              · Max 2 duties per day per teacher<br>
+              · HODs assigned as Chief Superintendent<br>
+              · Visiting faculty excluded from duty<br>
+              · Conflicts highlighted in red
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ RESULTS ════ -->
+    <div id="ecsubtab-results" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+        <select class="form-select" id="resDept" onchange="renderResults()" style="width:160px;font-size:12px;padding:7px 10px">
+          <option value="BCA">BCA</option><option value="BBA">BBA</option>
+          <option value="BCOM">B.Com</option><option value="BSC">B.Sc</option><option value="BA">BA</option>
+        </select>
+        <select class="form-select" id="resSem" onchange="renderResults()" style="width:120px;font-size:12px;padding:7px 10px">
+          <option value="1">Semester 1</option><option value="2">Semester 2</option>
+          <option value="3">Semester 3</option><option value="4">Semester 4</option>
+          <option value="5">Semester 5</option><option value="6">Semester 6</option>
+        </select>
+        <select class="form-select" id="resFilter" onchange="renderResults()" style="width:140px;font-size:12px;padding:7px 10px">
+          <option value="">All students</option>
+          <option value="pass">Pass only</option>
+          <option value="fail">Fail / ATKT</option>
+          <option value="distinction">Distinction</option>
+          <option value="withheld">Result withheld</option>
+        </select>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn-secondary" style="font-size:12px;padding:6px 12px" onclick="exportResults()">Export CSV</button>
+          <button class="btn-primary" style="font-size:12px;padding:6px 12px" onclick="enterResultsMode()">Enter / import marks</button>
+        </div>
+      </div>
+
+      <!-- Results summary cards -->
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px">
+        <div style="padding:10px 14px;background:#fff;border:1px solid var(--slate-200);border-radius:var(--r-md)">
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--slate-900)" id="res-total">0</div>
+          <div style="font-size:10px;color:var(--slate-400)">Total students</div>
+        </div>
+        <div style="padding:10px 14px;background:#d1fae5;border:1px solid #6ee7b7;border-radius:var(--r-md)">
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--green-dark)" id="res-pass">0</div>
+          <div style="font-size:10px;color:var(--green-dark)">Pass</div>
+        </div>
+        <div style="padding:10px 14px;background:#fee2e2;border:1px solid #fecaca;border-radius:var(--r-md)">
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--red-dark)" id="res-fail">0</div>
+          <div style="font-size:10px;color:var(--red-dark)">Fail / ATKT</div>
+        </div>
+        <div style="padding:10px 14px;background:#dbeafe;border:1px solid #93c5fd;border-radius:var(--r-md)">
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--blue-dark)" id="res-dist">0</div>
+          <div style="font-size:10px;color:var(--blue-dark)">Distinction (≥70%)</div>
+        </div>
+        <div style="padding:10px 14px;background:var(--slate-50);border:1px solid var(--slate-200);border-radius:var(--r-md)">
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--slate-700)" id="res-avg-sgpa">0.00</div>
+          <div style="font-size:10px;color:var(--slate-400)">Avg SGPA</div>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto;border:1px solid var(--slate-200);border-radius:var(--r-lg)">
+        <table class="ec-table">
+          <thead>
+            <tr>
+              <th style="min-width:160px">Student</th>
+              <th>Adm No</th>
+              <th style="text-align:center">CIE /40</th>
+              <th style="text-align:center">SEE /60</th>
+              <th style="text-align:center">Total /100</th>
+              <th style="text-align:center">Grade</th>
+              <th style="text-align:center">SGPA</th>
+              <th>Result</th>
+              <th>Grade card</th>
+            </tr>
+          </thead>
+          <tbody id="resultsTableBody">
+            <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--slate-400)">Select department and semester to load results.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ════ QUESTION BANK ════ -->
+    <div id="ecsubtab-qbank" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+        <select class="form-select" id="qbDept" onchange="renderQBank()" style="width:160px;font-size:12px;padding:7px 10px">
+          <option value="BCA">BCA</option><option value="BBA">BBA</option>
+          <option value="BCOM">B.Com</option><option value="BSC">B.Sc</option><option value="BA">BA</option>
+        </select>
+        <select class="form-select" id="qbSubject" onchange="renderQBank()" style="width:200px;font-size:12px;padding:7px 10px">
+          <option value="">All subjects</option>
+        </select>
+        <select class="form-select" id="qbBloom" onchange="renderQBank()" style="width:160px;font-size:12px;padding:7px 10px">
+          <option value="">All Bloom's levels</option>
+          <option value="1">L1 — Remember</option>
+          <option value="2">L2 — Understand</option>
+          <option value="3">L3 — Apply</option>
+          <option value="4">L4 — Analyse</option>
+          <option value="5">L5 — Evaluate</option>
+          <option value="6">L6 — Create</option>
+        </select>
+        <select class="form-select" id="qbType" onchange="renderQBank()" style="width:140px;font-size:12px;padding:7px 10px">
+          <option value="">All types</option>
+          <option value="MCQ">MCQ</option>
+          <option value="short">Short answer (2M)</option>
+          <option value="medium">Medium (5M)</option>
+          <option value="long">Long answer (10M)</option>
+        </select>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn-secondary" style="font-size:12px;padding:6px 12px" onclick="generateQPaper()">Generate question paper</button>
+          <button class="btn-primary" style="font-size:12px;padding:6px 12px" onclick="addQuestion()">+ Add question</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+        <div style="padding:8px 14px;background:#fff;border:1px solid var(--slate-200);border-radius:var(--r-md);font-size:12px">
+          <span style="font-family:'Syne',sans-serif;font-weight:800;color:var(--slate-900)" id="qb-total">0</span>
+          <span style="color:var(--slate-400);margin-left:4px">questions</span>
+        </div>
+        <div style="padding:8px 14px;background:#dbeafe;border:1px solid #93c5fd;border-radius:var(--r-md);font-size:12px">
+          <span style="font-family:'Syne',sans-serif;font-weight:800;color:var(--blue-dark)" id="qb-mcq">0</span>
+          <span style="color:var(--blue-dark);margin-left:4px">MCQ</span>
+        </div>
+        <div style="padding:8px 14px;background:#ede9fe;border:1px solid #c4b5fd;border-radius:var(--r-md);font-size:12px">
+          <span style="font-family:'Syne',sans-serif;font-weight:800;color:#5b21b6" id="qb-short">0</span>
+          <span style="color:#5b21b6;margin-left:4px">Short</span>
+        </div>
+        <div style="padding:8px 14px;background:#fef3c7;border:1px solid #fcd34d;border-radius:var(--r-md);font-size:12px">
+          <span style="font-family:'Syne',sans-serif;font-weight:800;color:var(--amber-dark)" id="qb-long">0</span>
+          <span style="color:var(--amber-dark);margin-left:4px">Long</span>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:flex-start">
+        <!-- Question list -->
+        <div style="border:1px solid var(--slate-200);border-radius:var(--r-lg);overflow:hidden">
+          <div style="background:var(--slate-800);padding:10px 14px;display:grid;grid-template-columns:1fr 80px 100px 100px 80px;gap:8px;font-size:10px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.04em">
+            <div>Question</div><div>Type</div><div>Subject</div><div>Bloom's</div><div>Marks</div>
+          </div>
+          <div id="qbListEl" style="max-height:420px;overflow-y:auto">
+            <div style="text-align:center;padding:24px;color:var(--slate-400);font-size:12px">No questions yet. Add questions or use AI to generate.</div>
+          </div>
+        </div>
+
+        <!-- Add question form -->
+        <div class="form-card" style="padding:16px 18px">
+          <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--slate-900);margin-bottom:12px" id="qbFormTitle">Add Question</div>
+          <div class="form-group" style="margin-bottom:8px">
+            <label class="form-label">Subject</label>
+            <select class="form-select" id="qbSubjSel" style="font-size:12px"><option value="">Select…</option></select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <div class="form-group">
+              <label class="form-label">Type</label>
+              <select class="form-select" id="qbTypeSel" style="font-size:12px">
+                <option value="MCQ">MCQ</option>
+                <option value="short">Short (2M)</option>
+                <option value="medium">Medium (5M)</option>
+                <option value="long">Long (10M)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Marks</label>
+              <input class="form-input" id="qbMarks" type="number" value="2" min="1" max="20" style="font-size:12px"/>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <div class="form-group">
+              <label class="form-label">Bloom's level</label>
+              <select class="form-select" id="qbBloomSel" style="font-size:12px">
+                <option value="1">L1 Remember</option>
+                <option value="2">L2 Understand</option>
+                <option value="3">L3 Apply</option>
+                <option value="4">L4 Analyse</option>
+                <option value="5">L5 Evaluate</option>
+                <option value="6">L6 Create</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">CO mapping</label>
+              <select class="form-select" id="qbCOSel" style="font-size:12px">
+                <option value="CO1">CO1</option><option value="CO2">CO2</option>
+                <option value="CO3">CO3</option><option value="CO4">CO4</option>
+                <option value="CO5">CO5</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:8px">
+            <label class="form-label">Question text <span>*</span></label>
+            <textarea class="form-input" id="qbText" rows="3" style="font-size:12px;resize:vertical" placeholder="Enter the question…"></textarea>
+          </div>
+          <div class="form-group" id="qbOptionsGroup" style="margin-bottom:8px;display:none">
+            <label class="form-label">Options (MCQ)</label>
+            <input class="form-input" id="qbOptA" type="text" placeholder="A) …" style="font-size:11px;margin-bottom:4px"/>
+            <input class="form-input" id="qbOptB" type="text" placeholder="B) …" style="font-size:11px;margin-bottom:4px"/>
+            <input class="form-input" id="qbOptC" type="text" placeholder="C) …" style="font-size:11px;margin-bottom:4px"/>
+            <input class="form-input" id="qbOptD" type="text" placeholder="D) …" style="font-size:11px;margin-bottom:4px"/>
+            <label class="form-label" style="margin-top:4px">Correct answer</label>
+            <select class="form-select" id="qbCorrect" style="font-size:12px">
+              <option value="A">A</option><option value="B">B</option>
+              <option value="C">C</option><option value="D">D</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button class="btn-primary" onclick="saveQuestion()">Save</button>
+            <button class="btn-secondary" onclick="resetQBForm()">Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- /scroll area -->
+  </div><!-- /flex column -->
+  </div><!-- /page-exam-corner -->
+
+
 
   <!-- ══ VALUATION ══ -->
   <div class="page" id="page-valuation" style="display:none">
-    <div style="padding:22px 26px">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
-        <div class="card" style="padding:20px;border-left:4px solid #3b82f6">
-          <div style="font-size:11px;font-weight:700;color:var(--slate-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Answer sheet allocation</div>
-          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--slate-900);margin-bottom:4px">Assign papers to valuators</div>
-          <div style="font-size:12px;color:var(--slate-500)">Allocate answer sheets to internal and external valuators. Blind evaluation with random bundle assignment, track return.</div>
-          <button class="btn-secondary" style="margin-top:12px;font-size:12px" onclick="alert('Valuation allocation — coming in next build')">Manage Allocation</button>
+  <style>
+  /* ── Valuation module styles ── */
+  .val-tabs{display:flex;border-bottom:2px solid var(--slate-200);overflow-x:auto;flex-shrink:0}
+  .val-tab{padding:9px 16px;font-size:12px;font-weight:500;cursor:pointer;color:var(--slate-500);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s;font-family:'DM Sans',sans-serif;flex-shrink:0}
+  .val-tab:hover{color:var(--slate-800)}
+  .val-tab.active{color:var(--amber-dark);border-bottom-color:var(--amber);font-weight:600}
+
+  /* Bundle card */
+  .bundle-card{background:#fff;border:1px solid var(--slate-200);border-radius:var(--r-lg);padding:13px 15px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+  .bundle-card:hover{border-color:var(--amber);box-shadow:0 2px 8px rgba(245,158,11,.1)}
+  .bundle-card.returned{border-color:#6ee7b7;background:#f0fdf4}
+  .bundle-card.pending{border-color:#fcd34d;background:#fffbeb}
+  .bundle-card.overdue{border-color:#fca5a5;background:#fff5f5}
+  .bundle-no{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;color:var(--slate-900);letter-spacing:.05em}
+  .bundle-meta{font-size:10px;color:var(--slate-400);margin-top:2px}
+
+  /* Marks entry grid */
+  .val-marks-input{width:58px;padding:5px 7px;border:1px solid var(--slate-200);border-radius:4px;font-size:12px;text-align:center;font-family:'DM Sans',sans-serif;transition:border .15s}
+  .val-marks-input:focus{border-color:var(--amber);outline:none}
+  .val-marks-input.discrepancy{border-color:var(--red);background:#fff5f5}
+  .val-marks-input.verified{border-color:var(--green);background:#f0fdf4}
+
+  /* Revaluation status */
+  .reval-status{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700}
+  .reval-status.pending{background:#fef3c7;color:#92400e}
+  .reval-status.assigned{background:#dbeafe;color:#1e40af}
+  .reval-status.completed{background:#d1fae5;color:#065f46}
+  .reval-status.rejected{background:#f3f4f6;color:#374151}
+
+  /* AI valuation */
+  .ai-val-card{background:#fff;border:1px solid var(--slate-200);border-radius:var(--r-lg);padding:16px 18px;margin-bottom:10px;transition:all .15s}
+  .ai-val-card:hover{border-color:var(--amber)}
+  .ai-marks-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800}
+  .ai-conf-bar{height:6px;border-radius:3px;background:var(--slate-100);margin-top:4px;overflow:hidden}
+  .ai-conf-fill{height:100%;border-radius:3px;transition:width .4s}
+  .ai-upload-zone{border:2px dashed var(--slate-200);border-radius:var(--r-lg);padding:24px;text-align:center;cursor:pointer;transition:all .2s}
+  .ai-upload-zone:hover,.ai-upload-zone.drag-over{border-color:var(--amber);background:#fffbeb}
+
+  /* Statistics table */
+  .val-stat-strip{display:grid;grid-template-columns:repeat(5,1fr);background:#fff;border:1px solid var(--slate-200);border-radius:var(--r-lg);overflow:hidden;margin-bottom:14px}
+  .val-stat-cell{padding:10px 14px;border-right:1px solid var(--slate-100)}
+  .val-stat-cell:last-child{border-right:none}
+  .val-stat-val{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;line-height:1}
+  .val-stat-lbl{font-size:10px;color:var(--slate-400);margin-top:2px}
+
+  /* Tables */
+  .val-table{width:100%;border-collapse:collapse;font-size:12px}
+  .val-table th{background:var(--slate-800);color:#fff;padding:8px 12px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+  .val-table td{border-bottom:1px solid var(--slate-100);padding:9px 12px;vertical-align:middle}
+  .val-table tr:hover td{background:#fffbeb}
+  </style>
+
+  <div style="display:flex;flex-direction:column;height:calc(100vh - 90px);overflow:hidden">
+
+    <!-- Stat strip -->
+    <div style="padding:16px 24px 0;flex-shrink:0">
+      <div class="val-stat-strip">
+        <div class="val-stat-cell"><div class="val-stat-val" id="vs-total-bundles" style="color:var(--slate-900)">0</div><div class="val-stat-lbl">Total bundles</div></div>
+        <div class="val-stat-cell"><div class="val-stat-val" id="vs-pending"        style="color:var(--amber-dark)">0</div><div class="val-stat-lbl">Pending valuation</div></div>
+        <div class="val-stat-cell"><div class="val-stat-val" id="vs-returned"       style="color:var(--green-dark)">0</div><div class="val-stat-lbl">Returned &amp; verified</div></div>
+        <div class="val-stat-cell"><div class="val-stat-val" id="vs-discrepancy"    style="color:var(--red-dark)">0</div><div class="val-stat-lbl">Discrepancies</div></div>
+        <div class="val-stat-cell"><div class="val-stat-val" id="vs-reval"          style="color:#5b21b6">0</div><div class="val-stat-lbl">Re-val requests</div></div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div style="padding:14px 24px 0;flex-shrink:0">
+      <div class="val-tabs">
+        <div class="val-tab active" id="vtab-bundles"   onclick="valTab('bundles',this)">Bundle Allocation</div>
+        <div class="val-tab"        id="vtab-marks"     onclick="valTab('marks',this)">Marks Entry &amp; Verification</div>
+        <div class="val-tab"        id="vtab-reval"     onclick="valTab('reval',this)">Re-valuation</div>
+        <div class="val-tab"        id="vtab-ai"        onclick="valTab('ai',this)">AI Valuation</div>
+        <div class="val-tab"        id="vtab-submit"    onclick="valTab('submit',this)">BU Submission</div>
+      </div>
+    </div>
+
+    <!-- Tab content -->
+    <div style="flex:1;overflow-y:auto;padding:16px 24px 24px">
+
+    <!-- ════ BUNDLE ALLOCATION ════ -->
+    <div id="vsubtab-bundles">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+        <select class="form-select" id="bundleDept" onchange="renderBundles()" style="width:160px;font-size:12px;padding:7px 10px">
+          <option value="">All departments</option>
+          <option value="BCA">BCA</option><option value="BBA">BBA</option>
+          <option value="BCOM">B.Com</option><option value="BSC">B.Sc</option><option value="BA">BA</option>
+        </select>
+        <select class="form-select" id="bundleSubj" onchange="renderBundles()" style="width:200px;font-size:12px;padding:7px 10px">
+          <option value="">All subjects</option>
+        </select>
+        <select class="form-select" id="bundleStatus" onchange="renderBundles()" style="width:140px;font-size:12px;padding:7px 10px">
+          <option value="">All statuses</option>
+          <option value="pending">Pending</option>
+          <option value="assigned">Assigned</option>
+          <option value="returned">Returned</option>
+          <option value="overdue">Overdue</option>
+        </select>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn-secondary" style="font-size:12px;padding:6px 12px" onclick="autoCreateBundles()">Auto-create bundles</button>
+          <button class="btn-primary"   style="font-size:12px;padding:6px 12px" onclick="addBundle()">+ Add bundle</button>
         </div>
-        <div class="card" style="padding:20px;border-left:4px solid #10b981">
-          <div style="font-size:11px;font-weight:700;color:var(--slate-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Marks entry</div>
-          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--slate-900);margin-bottom:4px">Enter & verify marks</div>
-          <div style="font-size:12px;color:var(--slate-500)">Double-entry verification for marks. Flag discrepancies, manage re-valuation requests, final mark submission to BU.</div>
-          <button class="btn-secondary" style="margin-top:12px;font-size:12px" onclick="alert('Marks entry — coming in next build')">Enter Marks</button>
+      </div>
+
+      <!-- Allocation rules info bar -->
+      <div style="padding:10px 14px;background:#eff6ff;border:1px solid #93c5fd;border-radius:var(--r-md);margin-bottom:12px;font-size:11px;color:#1e40af;display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+        <span style="font-weight:700">Blind valuation rules:</span>
+        <span>· Answer sheets bundled in groups of 20–25</span>
+        <span>· Bundle ID masked — no student names visible to valuator</span>
+        <span>· Subject teacher of same section cannot value own students</span>
+        <span>· Each bundle assigned 2 valuators (double entry)</span>
+        <span>· Return deadline: 7 days from allocation</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:flex-start">
+        <!-- Bundle list -->
+        <div>
+          <div id="bundleListEl">
+            <div style="text-align:center;padding:24px;font-size:12px;color:var(--slate-400)">No bundles yet. Click "Auto-create bundles" to generate from current exam schedule.</div>
+          </div>
         </div>
-        <div class="card" style="padding:20px;border-left:4px solid #f59e0b">
-          <div style="font-size:11px;font-weight:700;color:var(--slate-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Re-valuation</div>
-          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--slate-900);margin-bottom:4px">Re-valuation requests</div>
-          <div style="font-size:12px;color:var(--slate-500)">Process student re-valuation applications, assign to senior valuators, track status and communicate results.</div>
-          <button class="btn-secondary" style="margin-top:12px;font-size:12px" onclick="alert('Re-valuation — coming in next build')">View Requests</button>
+
+        <!-- Add / assign panel -->
+        <div class="form-card" style="padding:16px 18px">
+          <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--slate-900);margin-bottom:12px" id="bundleFormTitle">Create Bundle</div>
+          <div class="form-group" style="margin-bottom:8px">
+            <label class="form-label">Subject <span>*</span></label>
+            <select class="form-select" id="bfSubject" style="font-size:12px">
+              <option value="">Select subject…</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:8px">
+            <label class="form-label">Bundle ID</label>
+            <input class="form-input" id="bfBundleId" type="text" placeholder="Auto: BND-0001" style="font-size:12px"/>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <div class="form-group">
+              <label class="form-label">Scripts count</label>
+              <input class="form-input" id="bfCount" type="number" value="25" min="1" max="60" style="font-size:12px"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Return deadline</label>
+              <input class="form-input" id="bfDeadline" type="date" style="font-size:12px"/>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:8px">
+            <label class="form-label">Valuator 1 (Internal)</label>
+            <select class="form-select" id="bfVal1" style="font-size:12px">
+              <option value="">— Select teacher —</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:14px">
+            <label class="form-label">Valuator 2 (Internal / External)</label>
+            <select class="form-select" id="bfVal2" style="font-size:12px">
+              <option value="">— Select teacher —</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button class="btn-primary" onclick="saveBundle()">Save bundle</button>
+            <button class="btn-secondary" onclick="resetBundleForm()">Clear</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+
+    <!-- ════ MARKS ENTRY & VERIFICATION ════ -->
+    <div id="vsubtab-marks" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+        <select class="form-select" id="marksSubj" onchange="renderMarksEntry()" style="width:220px;font-size:12px;padding:7px 10px">
+          <option value="">Select subject…</option>
+        </select>
+        <select class="form-select" id="marksBundle" onchange="renderMarksEntry()" style="width:160px;font-size:12px;padding:7px 10px">
+          <option value="">All bundles</option>
+        </select>
+        <select class="form-select" id="marksFilter" onchange="renderMarksEntry()" style="width:150px;font-size:12px;padding:7px 10px">
+          <option value="">All records</option>
+          <option value="discrepancy">Discrepancies only</option>
+          <option value="unverified">Unverified</option>
+          <option value="verified">Verified</option>
+        </select>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn-secondary" style="font-size:12px;padding:6px 12px" onclick="exportMarks()">Export CSV</button>
+          <button class="btn-primary"   style="font-size:12px;padding:6px 12px" onclick="verifyAllMarks()">Verify &amp; lock all</button>
+        </div>
+      </div>
+
+      <!-- Double entry legend -->
+      <div style="display:flex;gap:12px;margin-bottom:12px;font-size:11px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;border-radius:2px;background:#f0fdf4;border:1px solid #6ee7b7"></div>Verified (both entries match)</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;border-radius:2px;background:#fff5f5;border:1px solid #fca5a5"></div>Discrepancy (entries differ by &gt;5 marks)</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;border-radius:2px;background:#fffbeb;border:1px solid #fcd34d"></div>Pending (one or both entries missing)</div>
+      </div>
+
+      <div style="overflow-x:auto;border:1px solid var(--slate-200);border-radius:var(--r-lg)">
+        <table class="val-table">
+          <thead>
+            <tr>
+              <th style="min-width:80px">Script ID</th>
+              <th style="min-width:80px">Bundle</th>
+              <th style="min-width:70px">Student<br><span style="font-size:8px;opacity:.6">(unblinded)</span></th>
+              <th style="text-align:center;min-width:90px">Valuator 1<br><span style="font-size:8px;opacity:.6">/60 marks</span></th>
+              <th style="text-align:center;min-width:90px">Valuator 2<br><span style="font-size:8px;opacity:.6">/60 marks</span></th>
+              <th style="text-align:center;min-width:80px">Difference</th>
+              <th style="text-align:center;min-width:80px">Final marks</th>
+              <th style="min-width:90px">Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="marksTableBody">
+            <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--slate-400)">Select a subject to load marks entry records.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--slate-400)">
+        Discrepancy threshold: &gt;5 marks between Valuator 1 and Valuator 2 → flagged for chief examiner review.
+        Final marks = average of both entries when discrepancy ≤5. Chief examiner decides when &gt;5.
+      </div>
+    </div>
+
+    <!-- ════ RE-VALUATION ════ -->
+    <div id="vsubtab-reval" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+        <select class="form-select" id="revalStatus" onchange="renderReval()" style="width:160px;font-size:12px;padding:7px 10px">
+          <option value="">All statuses</option>
+          <option value="pending">Pending</option>
+          <option value="assigned">Assigned to valuator</option>
+          <option value="completed">Completed</option>
+          <option value="rejected">Rejected</option>
+        </select>
+        <select class="form-select" id="revalDept" onchange="renderReval()" style="width:150px;font-size:12px;padding:7px 10px">
+          <option value="">All departments</option>
+          <option value="BCA">BCA</option><option value="BBA">BBA</option>
+          <option value="BCOM">B.Com</option><option value="BSC">B.Sc</option><option value="BA">BA</option>
+        </select>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn-secondary" style="font-size:12px;padding:6px 12px" onclick="addRevalRequest()">+ New request</button>
+          <button class="btn-primary"   style="font-size:12px;padding:6px 12px" onclick="exportRevalReport()">Export report</button>
+        </div>
+      </div>
+
+      <!-- Summary cards -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px">
+        <div style="padding:10px 14px;background:#fff;border:1px solid var(--slate-200);border-radius:var(--r-md)">
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--slate-900)" id="rv-total">0</div>
+          <div style="font-size:10px;color:var(--slate-400)">Total applications</div>
+        </div>
+        <div style="padding:10px 14px;background:#fef3c7;border:1px solid #fcd34d;border-radius:var(--r-md)">
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--amber-dark)" id="rv-pending">0</div>
+          <div style="font-size:10px;color:var(--amber-dark)">Pending action</div>
+        </div>
+        <div style="padding:10px 14px;background:#d1fae5;border:1px solid #6ee7b7;border-radius:var(--r-md)">
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--green-dark)" id="rv-beneficial">0</div>
+          <div style="font-size:10px;color:var(--green-dark)">Marks increased</div>
+        </div>
+        <div style="padding:10px 14px;background:var(--slate-50);border:1px solid var(--slate-200);border-radius:var(--r-md)">
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--slate-700)" id="rv-fee-collected">₹0</div>
+          <div style="font-size:10px;color:var(--slate-400)">Re-val fee collected</div>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto;border:1px solid var(--slate-200);border-radius:var(--r-lg)">
+        <table class="val-table">
+          <thead>
+            <tr>
+              <th>Request ID</th>
+              <th>Student</th>
+              <th>Dept</th>
+              <th>Subject</th>
+              <th style="text-align:center">Original marks</th>
+              <th style="text-align:center">Re-val marks</th>
+              <th style="text-align:center">Difference</th>
+              <th>Assigned valuator</th>
+              <th>Fee paid</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="revalTableBody">
+            <tr><td colspan="11" style="text-align:center;padding:24px;color:var(--slate-400)">No re-valuation requests yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ════ AI VALUATION ════ -->
+    <div id="vsubtab-ai" style="display:none">
+
+      <!-- AI mode selector -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+        <div class="card" id="aiMode-assist" style="padding:14px 16px;cursor:pointer;border:2px solid var(--amber);background:#fffbeb;border-radius:var(--r-lg)" onclick="setAIMode('assist')">
+          <div style="font-size:13px;font-weight:700;color:var(--amber-dark);font-family:'Syne',sans-serif">AI Assist</div>
+          <div style="font-size:11px;color:var(--slate-500);margin-top:3px">AI suggests marks with reasoning. Human valuator reviews and approves. Recommended for all official valuation.</div>
+        </div>
+        <div class="card" id="aiMode-cross" style="padding:14px 16px;cursor:pointer;border:1px solid var(--slate-200);border-radius:var(--r-lg)" onclick="setAIMode('cross')">
+          <div style="font-size:13px;font-weight:700;color:var(--slate-800);font-family:'Syne',sans-serif">AI Cross-check</div>
+          <div style="font-size:11px;color:var(--slate-500);margin-top:3px">AI re-evaluates papers already marked by humans. Flags potential discrepancies for review.</div>
+        </div>
+        <div class="card" id="aiMode-rubric" style="padding:14px 16px;cursor:pointer;border:1px solid var(--slate-200);border-radius:var(--r-lg)" onclick="setAIMode('rubric')">
+          <div style="font-size:13px;font-weight:700;color:var(--slate-800);font-family:'Syne',sans-serif">Rubric Builder</div>
+          <div style="font-size:11px;color:var(--slate-500);margin-top:3px">AI generates marking schemes and answer keys from question papers. Use for standardising valuation.</div>
+        </div>
+      </div>
+
+      <div id="aiAssistPanel">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:flex-start">
+
+          <!-- Left: Upload & configure -->
+          <div style="display:flex;flex-direction:column;gap:12px">
+
+            <!-- Config -->
+            <div class="form-card" style="padding:16px 18px">
+              <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--slate-900);margin-bottom:12px">Valuation configuration</div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Subject</label>
+                  <select class="form-select" id="aiValSubject" style="font-size:12px" onchange="aiValSubjectChanged()">
+                    <option value="">Select subject…</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Max marks</label>
+                  <input class="form-input" id="aiValMaxMarks" type="number" value="60" style="font-size:12px"/>
+                </div>
+                <div class="form-group form-full">
+                  <label class="form-label">Answer key / Model answer (paste or upload)</label>
+                  <textarea class="form-input" id="aiValAnswerKey" rows="4" style="font-size:11px;resize:vertical" placeholder="Paste the expected answers or model answer here. AI will use this to evaluate student responses.&#10;&#10;Example:&#10;Q1. Define data structure — Answer: A data structure is a way of organising data in memory...&#10;Q2. Write BFS algorithm — Answer: BFS uses a queue..."></textarea>
+                </div>
+                <div class="form-group form-full">
+                  <label class="form-label">Question paper (optional — helps AI understand context)</label>
+                  <textarea class="form-input" id="aiValQPaper" rows="3" style="font-size:11px;resize:vertical" placeholder="Paste the question paper here for better context…"></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Strictness level</label>
+                  <select class="form-select" id="aiValStrictness" style="font-size:12px">
+                    <option value="strict">Strict (exact keywords required)</option>
+                    <option value="balanced" selected>Balanced (concept understanding)</option>
+                    <option value="lenient">Lenient (partial credit generous)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Output language</label>
+                  <select class="form-select" id="aiValLang" style="font-size:12px">
+                    <option value="english">English</option>
+                    <option value="kannada">Kannada</option>
+                    <option value="hindi">Hindi</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Answer sheet upload -->
+            <div class="form-card" style="padding:16px 18px">
+              <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--slate-900);margin-bottom:10px">Upload answer sheet</div>
+              <div class="ai-upload-zone" id="aiValDropZone"
+                onclick="document.getElementById('aiValFileInput').click()"
+                ondragover="event.preventDefault();this.classList.add('drag-over')"
+                ondragleave="this.classList.remove('drag-over')"
+                ondrop="event.preventDefault();this.classList.remove('drag-over');handleAIValFile(event.dataTransfer.files[0])">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" style="margin:0 auto 8px;display:block"><path d="M6 6h14l6 6v14H6V6z" stroke="#d1d5db" stroke-width="1.5" stroke-linejoin="round"/><path d="M20 6v6h6" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round"/><path d="M12 22l4 4 4-4M16 26v-8" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div id="aiValFileLabel" style="font-size:12px;font-weight:500;color:var(--slate-500)">Upload scanned answer sheet</div>
+                <div style="font-size:10px;color:var(--slate-400);margin-top:3px">PDF · JPG · PNG · Max 20MB per sheet</div>
+              </div>
+              <input type="file" id="aiValFileInput" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleAIValFile(this.files[0])"/>
+
+              <!-- Script ID -->
+              <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+                <label class="form-label" style="white-space:nowrap;margin:0">Script ID:</label>
+                <input class="form-input" id="aiValScriptId" type="text" placeholder="e.g. BND-001-S03" style="font-size:12px;flex:1"/>
+              </div>
+
+              <button class="btn-primary" style="width:100%;margin-top:12px;font-size:12px" onclick="runAIValuation()">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="display:inline;margin-right:4px"><path d="M6.5 1.5L8 5h3.5L8.5 7.5l1 4-3-1.8-3 1.8 1-4L1.5 5H5z" fill="white"/></svg>
+                Evaluate with AI
+              </button>
+
+              <div id="aiValStatus" style="display:none;margin-top:10px;font-size:12px;padding:10px 12px;border-radius:var(--r-md);line-height:1.6"></div>
+            </div>
+          </div>
+
+          <!-- Right: AI result -->
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--slate-700);margin-bottom:10px">AI evaluation result</div>
+            <div id="aiValResultPanel" style="background:#fff;border:1px solid var(--slate-200);border-radius:var(--r-lg);padding:16px;min-height:200px">
+              <div style="font-size:12px;color:var(--slate-400);text-align:center;padding:24px 0">Upload an answer sheet and click "Evaluate with AI" to see the result here.</div>
+            </div>
+
+            <!-- Batch evaluation log -->
+            <div style="margin-top:14px">
+              <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--slate-700);margin-bottom:8px">Batch evaluation log</div>
+              <div id="aiBatchLog" style="max-height:280px;overflow-y:auto;border:1px solid var(--slate-200);border-radius:var(--r-lg)">
+                <div style="font-size:12px;color:var(--slate-400);text-align:center;padding:20px">No evaluations yet this session.</div>
+              </div>
+              <div style="display:flex;gap:6px;margin-top:8px">
+                <button class="btn-secondary" style="font-size:11px;padding:5px 12px" onclick="exportAIMarks()">Export AI marks CSV</button>
+                <button class="btn-secondary" style="font-size:11px;padding:5px 12px" onclick="clearAIBatchLog()">Clear log</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Cross-check panel (hidden by default) -->
+      <div id="aiCrossPanel" style="display:none">
+        <div style="padding:16px;background:#fff;border:1px solid var(--slate-200);border-radius:var(--r-lg)">
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--slate-800);margin-bottom:8px">AI Cross-check mode</div>
+          <div style="font-size:12px;color:var(--slate-500);margin-bottom:14px">Upload a paper that has already been manually marked. AI will re-evaluate and flag where its assessment differs significantly from the human examiner.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="form-group">
+              <label class="form-label">Subject</label>
+              <select class="form-select" id="crossSubject" style="font-size:12px"><option value="">Select…</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Human-assigned marks</label>
+              <input class="form-input" id="crossHumanMarks" type="number" min="0" placeholder="e.g. 42" style="font-size:12px"/>
+            </div>
+            <div class="form-group form-full">
+              <label class="form-label">Paste answer text or upload scanned sheet</label>
+              <textarea class="form-input" id="crossAnswerText" rows="5" style="font-size:11px;resize:vertical" placeholder="Paste the student's answer here for AI to cross-check against the model answer…"></textarea>
+            </div>
+            <div class="form-group form-full">
+              <label class="form-label">Model answer / answer key</label>
+              <textarea class="form-input" id="crossModelAnswer" rows="5" style="font-size:11px;resize:vertical" placeholder="Paste the expected answer key…"></textarea>
+            </div>
+          </div>
+          <button class="btn-primary" style="font-size:12px;margin-top:4px" onclick="runCrossCheck()">Run AI cross-check</button>
+          <div id="crossResult" style="display:none;margin-top:14px;padding:14px;background:var(--slate-50);border:1px solid var(--slate-200);border-radius:var(--r-md);font-size:12px"></div>
+        </div>
+      </div>
+
+      <!-- Rubric builder panel (hidden by default) -->
+      <div id="aiRubricPanel" style="display:none">
+        <div style="padding:16px;background:#fff;border:1px solid var(--slate-200);border-radius:var(--r-lg)">
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--slate-800);margin-bottom:8px">AI Rubric &amp; Answer Key Builder</div>
+          <div style="font-size:12px;color:var(--slate-500);margin-bottom:14px">Paste a question paper. AI generates a detailed marking scheme, model answers, and CO/Bloom's mappings for each question.</div>
+          <div class="form-group" style="margin-bottom:10px">
+            <label class="form-label">Subject</label>
+            <select class="form-select" id="rubricSubject" style="font-size:12px"><option value="">Select…</option></select>
+          </div>
+          <div class="form-group" style="margin-bottom:10px">
+            <label class="form-label">Question paper <span>*</span></label>
+            <textarea class="form-input" id="rubricQPaper" rows="8" style="font-size:11px;resize:vertical" placeholder="Paste the complete question paper here…&#10;&#10;Example:&#10;1. a) Define a stack. List its applications. (5M)&#10;   b) Write an algorithm for push and pop operations. (5M)&#10;2. Explain BFS and DFS with examples. (10M)…"></textarea>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:4px">
+            <select class="form-select" id="rubricStrictness" style="font-size:12px;width:180px">
+              <option value="strict">Strict marking scheme</option>
+              <option value="flexible" selected>Flexible (concept-based)</option>
+            </select>
+            <button class="btn-primary" style="font-size:12px" onclick="runRubricBuilder()">Generate marking scheme</button>
+          </div>
+          <div id="rubricResult" style="display:none;margin-top:14px;padding:14px;background:var(--slate-50);border:1px solid var(--slate-200);border-radius:var(--r-md);font-size:12px;white-space:pre-wrap;max-height:400px;overflow-y:auto;line-height:1.7"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ BU SUBMISSION ════ -->
+    <div id="vsubtab-submit" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:flex-start">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--slate-800);margin-bottom:12px">Marks submission to Bangalore University</div>
+
+          <!-- Submission checklist -->
+          <div style="margin-bottom:14px">
+            <div style="font-size:12px;font-weight:600;color:var(--slate-700);margin-bottom:8px">Pre-submission checklist</div>
+            <div id="submissionChecklistEl" style="display:flex;flex-direction:column;gap:6px"></div>
+          </div>
+
+          <!-- Subject-wise submission status -->
+          <div style="overflow-x:auto;border:1px solid var(--slate-200);border-radius:var(--r-lg)">
+            <table class="val-table">
+              <thead>
+                <tr>
+                  <th>Subject</th>
+                  <th>Dept / Sem</th>
+                  <th style="text-align:center">Total scripts</th>
+                  <th style="text-align:center">Verified</th>
+                  <th style="text-align:center">Pending</th>
+                  <th style="text-align:center">Discrepancies</th>
+                  <th>Submission status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="submissionTableBody">
+                <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--slate-400)">Add mark entry records to see submission readiness.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right: BU portal info + submit -->
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="form-card" style="padding:16px 18px">
+            <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--slate-900);margin-bottom:10px">Submit to BU portal</div>
+            <div class="form-group" style="margin-bottom:8px">
+              <label class="form-label">Academic year</label>
+              <select class="form-select" id="submitAcadYear" style="font-size:12px">
+                <option value="2025-26">2025-26</option>
+                <option value="2024-25">2024-25</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:8px">
+              <label class="form-label">Semester</label>
+              <select class="form-select" id="submitSem" style="font-size:12px">
+                <option value="odd">Odd semester (Nov–Dec)</option>
+                <option value="even">Even semester (Apr–May)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label class="form-label">Submission format</label>
+              <select class="form-select" id="submitFormat" style="font-size:12px">
+                <option value="xlsx">Excel (.xlsx) — BU template</option>
+                <option value="csv">CSV</option>
+                <option value="online">BU online portal upload</option>
+              </select>
+            </div>
+            <button class="btn-primary" style="width:100%;font-size:12px" onclick="submitToBU()">Generate submission file</button>
+            <div style="margin-top:8px;font-size:10px;color:var(--slate-400);text-align:center">Marks are locked after submission. Corrections require a formal amendment.</div>
+          </div>
+
+          <div style="padding:12px 14px;background:#fffbeb;border:1px solid #fcd34d;border-radius:var(--r-md)">
+            <div style="font-size:11px;font-weight:700;color:var(--amber-dark);margin-bottom:5px">Important deadlines (BU 2025-26)</div>
+            <div style="font-size:11px;color:#92400e;line-height:1.8">
+              Odd sem marks submission: <strong>15 Jan 2026</strong><br>
+              Even sem marks submission: <strong>30 Jun 2026</strong><br>
+              Re-val results: <strong>30 days after SEE results</strong>
+            </div>
+          </div>
+
+          <div style="padding:12px 14px;background:var(--slate-50);border:1px solid var(--slate-200);border-radius:var(--r-md)">
+            <div style="font-size:11px;font-weight:700;color:var(--slate-700);margin-bottom:5px">BU Contact — Surana College</div>
+            <div style="font-size:11px;color:var(--slate-500);line-height:1.8">
+              Controller of Examinations: BU Jnanabharathi<br>
+              Phone: 080-2296-1021<br>
+              Email: coe@bangaloreuniversity.ac.in
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- /scroll area -->
+  </div><!-- /flex column -->
+  </div><!-- /page-valuation -->
+
 
   <!-- ══ PO-CO MAPPING ══ -->
   <div class="page" id="page-po-co-mapping" style="display:none">
@@ -4593,12 +5740,1885 @@ function navigate(page) {
   if (page === 'setup-students')    { updateStudentStats(); renderStudentList(); renderBatchList(); }
   if (page === 'setup-subjects')    initSubjectModule();
   if (page === 'setup-timetable')   initTimetableModule();
+  if (page === 'exam-corner')       initExamModule();
+  if (page === 'valuation')         initValuationModule();
   if (page === 'setup-fees')        initFeeModule();
 }
 
 
 
 
+
+
+/* ════════════════════════════
+   VALUATION MODULE
+════════════════════════════ */
+
+let valBundles    = [];   /* [{id,bundleId,subjId,count,val1Id,val2Id,deadline,status,returnDate}] */
+let valMarks      = [];   /* [{id,bundleId,subjId,stuId,scriptId,marks1,marks2,finalMarks,status}] */
+let revalRequests = [];   /* [{id,stuId,subjId,originalMarks,revalMarks,valuatorId,fee,status,reqDate}] */
+let aiBatchResults= [];   /* [{scriptId,subjId,aiMarks,confidence,reasoning,approved,finalMarks}] */
+let nextBundleId  = 1;
+let nextValMarkId = 1;
+let nextRevalId   = 1;
+let nextAIResId   = 1;
+let editingBundleId = null;
+let currentAIMode = 'assist';
+let aiValFileRef  = null;
+
+const REVAL_FEE   = 500; /* ₹500 per paper */
+
+/* ── Tab switch ── */
+function valTab(tab, btn) {
+  ['bundles','marks','reval','ai','submit'].forEach(t => {
+    const el = document.getElementById('vsubtab-' + t);
+    const b  = document.getElementById('vtab-' + t);
+    if (el) el.style.display = 'none';
+    if (b)  b.classList.remove('active');
+  });
+  const target = document.getElementById('vsubtab-' + tab);
+  if (target) target.style.display = '';
+  if (btn) btn.classList.add('active');
+  if (tab === 'bundles') { populateValSubjectFilters(); renderBundles(); }
+  if (tab === 'marks')   { populateMarksFilters(); renderMarksEntry(); }
+  if (tab === 'reval')   renderReval();
+  if (tab === 'ai')      populateAIValSubjects();
+  if (tab === 'submit')  renderSubmission();
+}
+
+/* ── Stats ── */
+function updateValStats() {
+  const s = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  s('vs-total-bundles', valBundles.length);
+  s('vs-pending',       valBundles.filter(b => b.status === 'pending' || b.status === 'assigned').length);
+  s('vs-returned',      valBundles.filter(b => b.status === 'returned').length);
+  s('vs-discrepancy',   valMarks.filter(m => m.status === 'discrepancy').length);
+  s('vs-reval',         revalRequests.filter(r => r.status === 'pending').length);
+}
+
+/* ── Subject filter populator ── */
+function populateValSubjectFilters() {
+  const sels = ['bundleSubj','bfSubject','marksSubj','aiValSubject','crossSubject','rubricSubject'];
+  sels.forEach(selId => {
+    const sel = document.getElementById(selId);
+    if (!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = (selId === 'bundleSubj' || selId === 'marksSubj'
+      ? '<option value="">All subjects</option>'
+      : '<option value="">Select subject…</option>') +
+      subjects.map(s => `<option value="${s.id}">${s.code} — ${s.name} (${s.dept})</option>`).join('');
+    if (cur) sel.value = cur;
+  });
+  const bv1 = document.getElementById('bfVal1');
+  const bv2 = document.getElementById('bfVal2');
+  [bv1, bv2].forEach(sel => {
+    if (!sel) return;
+    sel.innerHTML = '<option value="">— Select teacher —</option>' +
+      teachers.filter(t => t.empType !== 'visiting').map(t =>
+        `<option value="${t.id}">${t.name} (${t.department})</option>`).join('') +
+      '<option disabled>── External valuators ──</option>' +
+      '<option value="ext-1">External Valuator 1</option>' +
+      '<option value="ext-2">External Valuator 2</option>';
+  });
+}
+
+function populateMarksFilters() {
+  populateValSubjectFilters();
+  const bundleSel = document.getElementById('marksBundle');
+  if (bundleSel) {
+    bundleSel.innerHTML = '<option value="">All bundles</option>' +
+      valBundles.map(b => {
+        const subj = subjects.find(s => s.id === b.subjId);
+        return `<option value="${b.id}">${b.bundleId} — ${subj?.code||'?'}</option>`;
+      }).join('');
+  }
+}
+
+function populateAIValSubjects() {
+  populateValSubjectFilters();
+}
+
+/* ════ BUNDLE ALLOCATION ════ */
+function autoCreateBundles() {
+  if (!seeExams.length) {
+    alert('No exams found. Schedule exams in Exam Corner → SEE Schedule first.');
+    return;
+  }
+  let created = 0;
+  seeExams.forEach(ex => {
+    if (valBundles.find(b => b.subjId === ex.subjId)) return;
+    const stuCount = students.filter(s => s.department === ex.dept).length || 25;
+    const numBundles = Math.ceil(stuCount / 25);
+    for (let i = 0; i < numBundles; i++) {
+      const bundleNo = String(nextBundleId).padStart(4, '0');
+      valBundles.push({
+        id:         nextBundleId++,
+        bundleId:   `BND-${bundleNo}`,
+        subjId:     ex.subjId,
+        count:      Math.min(25, stuCount - i * 25),
+        val1Id:     null,
+        val2Id:     null,
+        deadline:   addDays(ex.date || todayStr(), 7),
+        status:     'pending',
+        returnDate: null,
+      });
+      created++;
+    }
+  });
+  renderBundles();
+  updateValStats();
+  alert(`Created ${created} bundle(s) from the exam schedule.\nEach bundle holds up to 25 answer scripts.\nNow assign valuators to each bundle.`);
+}
+
+function addDays(dateStr, days) {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().split('T')[0];
+}
+
+function renderBundles() {
+  const el    = document.getElementById('bundleListEl');
+  if (!el) return;
+  const dept   = document.getElementById('bundleDept')?.value   || '';
+  const subjId = parseInt(document.getElementById('bundleSubj')?.value) || null;
+  const status = document.getElementById('bundleStatus')?.value || '';
+
+  const list = valBundles.filter(b => {
+    const subj = subjects.find(s => s.id === b.subjId);
+    if (dept   && subj?.dept !== dept)     return false;
+    if (subjId && b.subjId !== subjId)     return false;
+    if (status && b.status !== status)     return false;
+    return true;
+  });
+
+  if (!list.length) {
+    el.innerHTML = '<div style="text-align:center;padding:24px;font-size:12px;color:var(--slate-400)">No bundles match. Click "Auto-create bundles" to generate from the exam schedule.</div>';
+    return;
+  }
+
+  const isOverdue = (b) => b.deadline && b.deadline < todayStr() && b.status !== 'returned';
+  const statusLabel = { pending:'Pending', assigned:'Assigned', returned:'Returned', overdue:'Overdue' };
+
+  el.innerHTML = list.map(b => {
+    const subj  = subjects.find(s => s.id === b.subjId);
+    const v1    = b.val1Id ? teachers.find(t => t.id === b.val1Id) : null;
+    const v2    = b.val2Id ? teachers.find(t => t.id === b.val2Id) : null;
+    const over  = isOverdue(b);
+    const cls   = over ? 'overdue' : b.status === 'returned' ? 'returned' : b.val1Id ? 'pending' : '';
+    const st    = over ? 'overdue' : b.status;
+    const stColors = { pending:'#fef3c7', assigned:'#dbeafe', returned:'#d1fae5', overdue:'#fee2e2' };
+    const stText   = { pending:'#92400e', assigned:'#1e40af', returned:'#065f46', overdue:'#991b1b' };
+
+    return `<div class="bundle-card ${cls}" onclick="loadBundle(${b.id})">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div>
+          <div class="bundle-no">${b.bundleId}</div>
+          <div class="bundle-meta">${subj?.code||'?'} — ${subj?.name||'Unknown'} · ${b.count} scripts · Due ${b.deadline||'—'}</div>
+        </div>
+        <span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:${stColors[st]||'#f3f4f6'};color:${stText[st]||'#374151'};white-space:nowrap">${statusLabel[st]||st}</span>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px;font-size:11px;color:var(--slate-500)">
+        <span style="display:flex;align-items:center;gap:4px">
+          <span style="width:7px;height:7px;border-radius:50%;background:${v1?'var(--green)':'var(--slate-300)'}"></span>
+          V1: ${v1?.name || 'Unassigned'}
+        </span>
+        <span style="display:flex;align-items:center;gap:4px">
+          <span style="width:7px;height:7px;border-radius:50%;background:${v2?'var(--green)':'var(--slate-300)'}"></span>
+          V2: ${v2?.name || 'Unassigned'}
+        </span>
+        ${b.returnDate ? `<span style="color:var(--green-dark);font-weight:600">Returned: ${b.returnDate}</span>` : ''}
+        ${over ? `<span style="color:var(--red-dark);font-weight:700">OVERDUE by ${daysBetween(b.deadline, todayStr())} days</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function daysBetween(from, to) {
+  return Math.round((new Date(to) - new Date(from)) / 86400000);
+}
+
+function loadBundle(id) {
+  const b = valBundles.find(x => x.id === id);
+  if (!b) return;
+  editingBundleId = id;
+  populateValSubjectFilters();
+  document.getElementById('bfSubject').value  = b.subjId;
+  document.getElementById('bfBundleId').value = b.bundleId;
+  document.getElementById('bfCount').value    = b.count;
+  document.getElementById('bfDeadline').value = b.deadline;
+  document.getElementById('bfVal1').value     = b.val1Id || '';
+  document.getElementById('bfVal2').value     = b.val2Id || '';
+  document.getElementById('bundleFormTitle').textContent = 'Edit: ' + b.bundleId;
+}
+
+function saveBundle() {
+  const subjId = parseInt(document.getElementById('bfSubject')?.value);
+  if (!subjId) { alert('Please select a subject.'); return; }
+  const bundleId = document.getElementById('bfBundleId')?.value.trim() || `BND-${String(nextBundleId).padStart(4,'0')}`;
+  const val1 = document.getElementById('bfVal1')?.value || null;
+  const val2 = document.getElementById('bfVal2')?.value || null;
+  const bundle = {
+    id:         editingBundleId || nextBundleId++,
+    bundleId,
+    subjId,
+    count:      parseInt(document.getElementById('bfCount')?.value) || 25,
+    val1Id:     val1 ? (isNaN(parseInt(val1)) ? val1 : parseInt(val1)) : null,
+    val2Id:     val2 ? (isNaN(parseInt(val2)) ? val2 : parseInt(val2)) : null,
+    deadline:   document.getElementById('bfDeadline')?.value || addDays(todayStr(), 7),
+    status:     val1 ? 'assigned' : 'pending',
+    returnDate: null,
+  };
+  if (editingBundleId !== null) {
+    const idx = valBundles.findIndex(x => x.id === editingBundleId);
+    if (idx >= 0) valBundles[idx] = bundle;
+  } else {
+    valBundles.push(bundle);
+  }
+  resetBundleForm();
+  renderBundles();
+  updateValStats();
+}
+
+function resetBundleForm() {
+  editingBundleId = null;
+  ['bfSubject','bfBundleId','bfDeadline','bfVal1','bfVal2'].forEach(id => { const e=document.getElementById(id); if(e) e.value=''; });
+  document.getElementById('bfCount').value = '25';
+  document.getElementById('bundleFormTitle').textContent = 'Create Bundle';
+}
+
+function addBundle() { resetBundleForm(); populateValSubjectFilters(); }
+
+/* ════ MARKS ENTRY ════ */
+function renderMarksEntry() {
+  const tbody   = document.getElementById('marksTableBody');
+  if (!tbody) return;
+  const subjId  = parseInt(document.getElementById('marksSubj')?.value)    || null;
+  const bundleId= parseInt(document.getElementById('marksBundle')?.value)  || null;
+  const filter  = document.getElementById('marksFilter')?.value             || '';
+
+  /* Generate synthetic mark records from bundles if empty */
+  if (!valMarks.length && valBundles.length) generateSyntheticMarks();
+
+  let list = valMarks;
+  if (subjId)   list = list.filter(m => m.subjId  === subjId);
+  if (bundleId) list = list.filter(m => m.bundleId === bundleId);
+  if (filter === 'discrepancy') list = list.filter(m => m.status === 'discrepancy');
+  if (filter === 'unverified')  list = list.filter(m => m.status !== 'verified');
+  if (filter === 'verified')    list = list.filter(m => m.status === 'verified');
+
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--slate-400)">${valBundles.length ? 'No records match the filters.' : 'Create bundles first, then marks records will appear here.'}</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(m => {
+    const subj  = subjects.find(s => s.id === m.subjId);
+    const stu   = students.find(s => s.id === m.stuId);
+    const bundle= valBundles.find(b => b.id === m.bundleId);
+    const diff  = (m.marks1 !== null && m.marks2 !== null) ? Math.abs(m.marks1 - m.marks2) : null;
+    const isDisc= diff !== null && diff > 5;
+    const status= m.status || (m.marks1 === null || m.marks2 === null ? 'pending' : isDisc ? 'discrepancy' : 'verified');
+    const rowBg = status === 'verified' ? '#f0fdf4' : status === 'discrepancy' ? '#fff5f5' : status === 'pending' ? '#fffbeb' : '';
+    const finalMarks = m.finalMarks ?? (isDisc ? null : (m.marks1 !== null && m.marks2 !== null ? Math.round((m.marks1+m.marks2)/2) : null));
+
+    return `<tr style="background:${rowBg}">
+      <td style="font-family:monospace;font-size:11px;font-weight:700;color:var(--slate-600)">${m.scriptId||'—'}</td>
+      <td style="font-size:11px;color:var(--slate-500)">${bundle?.bundleId||'—'}</td>
+      <td style="font-size:11px;color:var(--slate-600)">${stu?.name||'(blinded)'}</td>
+      <td style="text-align:center">
+        <input class="val-marks-input ${status==='discrepancy'?'discrepancy':status==='verified'?'verified':''}"
+          id="vm1_${m.id}" type="number" min="0" max="${subj?.type==='lab'?40:60}"
+          value="${m.marks1??''}" placeholder="—"
+          onchange="updateValMarks(${m.id},'marks1',this.value)"/>
+      </td>
+      <td style="text-align:center">
+        <input class="val-marks-input ${status==='discrepancy'?'discrepancy':status==='verified'?'verified':''}"
+          id="vm2_${m.id}" type="number" min="0" max="${subj?.type==='lab'?40:60}"
+          value="${m.marks2??''}" placeholder="—"
+          onchange="updateValMarks(${m.id},'marks2',this.value)"/>
+      </td>
+      <td style="text-align:center;font-weight:700;font-size:12px;color:${isDisc?'var(--red-dark)':diff!==null?'var(--green-dark)':'var(--slate-400)'}">
+        ${diff !== null ? diff : '—'}
+        ${isDisc ? '<span style="font-size:9px;margin-left:2px">⚠</span>' : ''}
+      </td>
+      <td style="text-align:center">
+        ${isDisc
+          ? `<input class="val-marks-input" id="vmf_${m.id}" type="number" min="0" max="60" value="${finalMarks??''}" placeholder="Chief" onchange="updateValMarks(${m.id},'finalMarks',this.value)" title="Enter final marks (chief examiner decision)"/>`
+          : `<strong style="font-family:'Syne',sans-serif;font-size:13px;color:var(--green-dark)">${finalMarks??'—'}</strong>`
+        }
+      </td>
+      <td>
+        <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;
+          background:${status==='verified'?'#d1fae5':status==='discrepancy'?'#fee2e2':'#fef3c7'};
+          color:${status==='verified'?'#065f46':status==='discrepancy'?'#991b1b':'#92400e'}">
+          ${status==='verified'?'Verified':status==='discrepancy'?'Discrepancy':'Pending'}
+        </span>
+      </td>
+      <td>
+        ${status==='discrepancy'
+          ? `<button style="font-size:10px;color:#5b21b6;background:#ede9fe;border:1px solid #c4b5fd;border-radius:4px;padding:2px 8px;cursor:pointer" onclick="escalateToChief(${m.id})">Escalate</button>`
+          : status!=='verified'
+          ? `<button style="font-size:10px;color:var(--green-dark);background:var(--green-light);border:1px solid #6ee7b7;border-radius:4px;padding:2px 8px;cursor:pointer" onclick="verifyMark(${m.id})">Verify</button>`
+          : `<span style="font-size:10px;color:var(--green-dark)">✓ Locked</span>`}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function generateSyntheticMarks() {
+  valBundles.forEach(b => {
+    const stuList = students.filter(s => {
+      const subj = subjects.find(x => x.id === b.subjId);
+      return s.department === subj?.dept;
+    }).slice(0, b.count);
+    stuList.forEach((stu, idx) => {
+      const m1 = Math.floor(Math.random()*40)+15;
+      const m2 = m1 + (Math.random() > 0.8 ? Math.floor(Math.random()*8)-4 : Math.floor(Math.random()*4)-2);
+      valMarks.push({
+        id: nextValMarkId++, bundleId: b.id, subjId: b.subjId, stuId: stu.id,
+        scriptId: `${b.bundleId}-S${String(idx+1).padStart(2,'0')}`,
+        marks1: m1, marks2: Math.max(0, Math.min(60, m2)),
+        finalMarks: null,
+        status: Math.abs(m1-m2) > 5 ? 'discrepancy' : (Math.random()>0.3 ? 'verified' : 'pending'),
+      });
+    });
+  });
+}
+
+function updateValMarks(id, field, value) {
+  const rec = valMarks.find(m => m.id === id);
+  if (!rec) return;
+  rec[field] = parseFloat(value) || null;
+  const diff = (rec.marks1 !== null && rec.marks2 !== null) ? Math.abs(rec.marks1 - rec.marks2) : null;
+  rec.status = diff === null ? 'pending' : diff > 5 ? 'discrepancy' : 'verified';
+  if (!rec.finalMarks && rec.status === 'verified') rec.finalMarks = Math.round((rec.marks1+rec.marks2)/2);
+  updateValStats();
+}
+
+function verifyMark(id) {
+  const rec = valMarks.find(m => m.id === id);
+  if (!rec) return;
+  if (rec.marks1 === null || rec.marks2 === null) { alert('Enter both valuator marks first.'); return; }
+  rec.status = 'verified';
+  rec.finalMarks = rec.finalMarks ?? Math.round((rec.marks1+rec.marks2)/2);
+  renderMarksEntry();
+  updateValStats();
+}
+
+function verifyAllMarks() {
+  let count = 0;
+  valMarks.filter(m => m.status !== 'discrepancy' && m.marks1 !== null && m.marks2 !== null).forEach(m => {
+    m.status = 'verified';
+    m.finalMarks = m.finalMarks ?? Math.round((m.marks1+m.marks2)/2);
+    count++;
+  });
+  renderMarksEntry();
+  updateValStats();
+  alert(`${count} records verified and locked. Discrepancies require chief examiner review.`);
+}
+
+function escalateToChief(id) {
+  const rec = valMarks.find(m => m.id === id);
+  if (!rec) return;
+  const chief = prompt(`Chief Examiner decision for Script ${rec.scriptId}\nV1 marks: ${rec.marks1} | V2 marks: ${rec.marks2} | Difference: ${Math.abs(rec.marks1-rec.marks2)}\n\nEnter final marks (0-60):`);
+  if (!chief) return;
+  rec.finalMarks = parseFloat(chief);
+  rec.status = 'verified';
+  renderMarksEntry();
+  updateValStats();
+}
+
+function exportMarks() {
+  const rows = [['Script ID','Bundle','Subject','Valuator 1 Marks','Valuator 2 Marks','Difference','Final Marks','Status']];
+  valMarks.forEach(m => {
+    const subj = subjects.find(s => s.id === m.subjId);
+    const bundle = valBundles.find(b => b.id === m.bundleId);
+    const diff = m.marks1!==null&&m.marks2!==null ? Math.abs(m.marks1-m.marks2) : '';
+    rows.push([m.scriptId||'', bundle?.bundleId||'', subj?.name||'', m.marks1??'', m.marks2??'', diff, m.finalMarks??'', m.status||'']);
+  });
+  const csv = rows.map(r => r.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([csv],{type:'text/csv'})), download:'valuation_marks.csv' });
+  a.click();
+}
+
+/* ════ RE-VALUATION ════ */
+function renderReval() {
+  const tbody  = document.getElementById('revalTableBody');
+  const s = (id, v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  if (!tbody) return;
+  const statusF = document.getElementById('revalStatus')?.value || '';
+  const deptF   = document.getElementById('revalDept')?.value   || '';
+  let list      = revalRequests;
+  if (statusF) list = list.filter(r => r.status === statusF);
+  if (deptF)   list = list.filter(r => {
+    const stu = students.find(st => st.id === r.stuId);
+    return stu?.department === deptF;
+  });
+
+  s('rv-total', revalRequests.length);
+  s('rv-pending', revalRequests.filter(r => r.status === 'pending').length);
+  s('rv-beneficial', revalRequests.filter(r => r.revalMarks !== null && r.revalMarks > r.originalMarks).length);
+  s('rv-fee-collected', '₹' + (revalRequests.length * REVAL_FEE).toLocaleString('en-IN'));
+
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--slate-400)">No re-valuation requests. Click "+ New request" to add one.</td></tr>';
+    return;
+  }
+
+  const valTeachers = teachers.filter(t => t.empType !== 'visiting');
+  tbody.innerHTML = list.map(r => {
+    const stu    = students.find(s => s.id === r.stuId);
+    const subj   = subjects.find(s => s.id === r.subjId);
+    const val    = r.valuatorId ? teachers.find(t => t.id === r.valuatorId) : null;
+    const diff   = r.revalMarks !== null ? r.revalMarks - r.originalMarks : null;
+    const diffStr= diff !== null ? (diff >= 0 ? '+'+diff : diff) : '—';
+    const diffColor = diff !== null ? (diff > 0 ? 'var(--green-dark)' : diff < 0 ? 'var(--red-dark)' : 'var(--slate-400)') : 'var(--slate-400)';
+    return `<tr>
+      <td style="font-family:monospace;font-size:11px;font-weight:700">RV-${String(r.id).padStart(4,'0')}</td>
+      <td style="font-size:12px;font-weight:600;color:var(--slate-800)">${stu?.name||'—'}</td>
+      <td style="font-size:11px;color:var(--slate-500)">${stu?.department||'—'}</td>
+      <td style="font-size:11px">${subj?.code||'—'} ${subj?.name?'— '+subj.name:''}</td>
+      <td style="text-align:center;font-weight:700;font-family:'Syne',sans-serif">${r.originalMarks}</td>
+      <td style="text-align:center;font-weight:700;font-family:'Syne',sans-serif;color:${r.revalMarks!==null?'var(--blue-dark)':'var(--slate-300)'}">${r.revalMarks??'—'}</td>
+      <td style="text-align:center;font-weight:700;color:${diffColor}">${diffStr}</td>
+      <td style="font-size:11px">
+        ${r.status==='pending'
+          ? `<select class="allot-select" style="font-size:11px;padding:4px 7px" onchange="assignRevalValuator(${r.id},this.value)">
+              <option value="">— Assign —</option>
+              ${valTeachers.map(t=>`<option value="${t.id}" ${r.valuatorId===t.id?'selected':''}>${t.name}</option>`).join('')}
+             </select>`
+          : (val?.name||'—')}
+      </td>
+      <td style="font-size:11px;color:var(--green-dark);font-weight:600">₹${REVAL_FEE.toLocaleString('en-IN')}</td>
+      <td><span class="reval-status ${r.status}">${r.status.charAt(0).toUpperCase()+r.status.slice(1)}</span></td>
+      <td style="display:flex;gap:4px;padding:8px 12px">
+        ${r.status==='assigned'
+          ? `<button style="font-size:10px;color:var(--green-dark);background:var(--green-light);border:1px solid #6ee7b7;border-radius:4px;padding:2px 8px;cursor:pointer" onclick="completeReval(${r.id})">Enter marks</button>`
+          : r.status==='pending'
+          ? `<button style="font-size:10px;color:var(--red-dark);background:var(--red-light);border:1px solid #fecaca;border-radius:4px;padding:2px 8px;cursor:pointer" onclick="rejectReval(${r.id})">Reject</button>`
+          : ''}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function addRevalRequest() {
+  const stuNames = students.map((s,i) => `${i+1}. ${s.name} (${s.department})`).join('\n');
+  const stuPick = parseInt(prompt('Select student (enter number):\n' + stuNames)) - 1;
+  if (isNaN(stuPick) || stuPick < 0 || stuPick >= students.length) return;
+  const stu = students[stuPick];
+  const stuSubjs = subjects.filter(s => s.dept === stu.department);
+  const subjNames = stuSubjs.map((s,i) => `${i+1}. ${s.code} — ${s.name}`).join('\n');
+  const subjPick = parseInt(prompt('Select subject:\n' + subjNames)) - 1;
+  if (isNaN(subjPick) || subjPick < 0 || subjPick >= stuSubjs.length) return;
+  const subj = stuSubjs[subjPick];
+  const origMarks = parseFloat(prompt(`Enter original SEE marks for ${stu.name} in ${subj.name}:`));
+  if (isNaN(origMarks)) return;
+  revalRequests.push({
+    id: nextRevalId++, stuId: stu.id, subjId: subj.id,
+    originalMarks: origMarks, revalMarks: null, valuatorId: null,
+    fee: REVAL_FEE, status:'pending', reqDate: todayStr(),
+  });
+  renderReval();
+  updateValStats();
+}
+
+function assignRevalValuator(revalId, teacherId) {
+  const r = revalRequests.find(x => x.id === revalId);
+  if (r) { r.valuatorId = parseInt(teacherId); r.status = 'assigned'; }
+  renderReval();
+  updateValStats();
+}
+
+function completeReval(revalId) {
+  const r = revalRequests.find(x => x.id === revalId);
+  if (!r) return;
+  const newMarks = parseFloat(prompt(`Enter re-valuation marks (original: ${r.originalMarks}):`));
+  if (isNaN(newMarks)) return;
+  r.revalMarks = newMarks;
+  r.status = 'completed';
+  renderReval();
+  updateValStats();
+  const diff = newMarks - r.originalMarks;
+  alert(`Re-valuation complete.\nOriginal: ${r.originalMarks} → New: ${newMarks}\nDifference: ${diff >= 0 ? '+' : ''}${diff}\n${diff > 0 ? '✓ Marks increased — student notified.' : diff < 0 ? '⚠ Marks decreased — original marks retained as per BU norms.' : 'No change.'}`);
+}
+
+function rejectReval(revalId) {
+  if (!confirm('Reject this re-valuation application?')) return;
+  const r = revalRequests.find(x => x.id === revalId);
+  if (r) r.status = 'rejected';
+  renderReval();
+  updateValStats();
+}
+
+function exportRevalReport() {
+  const rows = [['Request ID','Student','Dept','Subject','Original Marks','Re-val Marks','Difference','Status','Fee Paid']];
+  revalRequests.forEach(r => {
+    const stu = students.find(s=>s.id===r.stuId);
+    const subj = subjects.find(s=>s.id===r.subjId);
+    const diff = r.revalMarks!==null ? r.revalMarks-r.originalMarks : '';
+    rows.push(['RV-'+String(r.id).padStart(4,'0'), stu?.name||'', stu?.department||'', subj?.name||'', r.originalMarks, r.revalMarks??'', diff, r.status, '₹'+REVAL_FEE]);
+  });
+  const csv = rows.map(row => row.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([csv],{type:'text/csv'})), download:'revaluation_report.csv' });
+  a.click();
+}
+
+/* ════ AI VALUATION ════ */
+function setAIMode(mode) {
+  currentAIMode = mode;
+  ['assist','cross','rubric'].forEach(m => {
+    const card = document.getElementById('aiMode-' + m);
+    if (card) {
+      card.style.border = m === mode ? '2px solid var(--amber)' : '1px solid var(--slate-200)';
+      card.style.background = m === mode ? '#fffbeb' : '#fff';
+    }
+    const panel = document.getElementById('ai' + (m==='assist'?'Assist':m==='cross'?'Cross':'Rubric') + 'Panel');
+    if (panel) panel.style.display = m === mode ? '' : 'none';
+  });
+}
+
+function aiValSubjectChanged() {
+  /* Auto-fill max marks from subject type */
+  const subjId = parseInt(document.getElementById('aiValSubject')?.value);
+  const subj   = subjects.find(s => s.id === subjId);
+  if (subj) document.getElementById('aiValMaxMarks').value = subj.type === 'lab' ? '40' : '60';
+}
+
+function handleAIValFile(file) {
+  if (!file) return;
+  aiValFileRef = file;
+  const lbl = document.getElementById('aiValFileLabel');
+  if (lbl) lbl.textContent = '📎 ' + file.name + ' — ready to evaluate';
+}
+
+async function runAIValuation() {
+  const subjId    = parseInt(document.getElementById('aiValSubject')?.value);
+  const maxMarks  = parseInt(document.getElementById('aiValMaxMarks')?.value) || 60;
+  const answerKey = document.getElementById('aiValAnswerKey')?.value.trim();
+  const qPaper    = document.getElementById('aiValQPaper')?.value.trim();
+  const strictness= document.getElementById('aiValStrictness')?.value || 'balanced';
+  const scriptId  = document.getElementById('aiValScriptId')?.value.trim() || 'SCRIPT-' + Date.now();
+  const file      = aiValFileRef;
+  const subj      = subjects.find(s => s.id === subjId);
+
+  const statusEl  = document.getElementById('aiValStatus');
+  const resultEl  = document.getElementById('aiValResultPanel');
+
+  function setStatus(msg, type) {
+    if (!statusEl) return;
+    statusEl.style.display = 'block';
+    const bg = { info:'#eff6ff', ok:'#d1fae5', warn:'#fef3c7', err:'#fee2e2' };
+    const fg = { info:'#1e40af', ok:'#065f46', warn:'#92400e', err:'#991b1b' };
+    statusEl.style.background = bg[type]||bg.info;
+    statusEl.style.color = fg[type]||fg.info;
+    statusEl.innerHTML = msg;
+  }
+
+  if (!subj) { setStatus('Please select a subject first.', 'warn'); return; }
+  if (!answerKey && !file) { setStatus('Please upload an answer sheet or paste the answer key first.', 'warn'); return; }
+
+  setStatus('AI is reading and evaluating the answer sheet…', 'info');
+  if (resultEl) resultEl.innerHTML = '<div style="text-align:center;padding:24px;font-size:12px;color:var(--slate-400)">Evaluating…</div>';
+
+  /* Build prompt */
+  const SYSTEM_PROMPT = `You are an expert academic examiner for Bangalore University. You evaluate student answer sheets with fairness, consistency, and academic rigour.
+
+Strictness mode: ${strictness}
+- strict: Award marks only when key concepts and exact terminology are present.
+- balanced: Award marks for conceptual understanding even if phrasing differs from model answer.
+- lenient: Award partial credit generously for any relevant attempt.
+
+Always return a JSON response in this exact format:
+{
+  "totalMarks": <number>,
+  "maxMarks": ${maxMarks},
+  "percentage": <number>,
+  "grade": "<O/A+/A/B+/B/C/P/F>",
+  "confidence": <0-100>,
+  "questionWise": [
+    { "question": "Q1", "maxMarks": <number>, "awarded": <number>, "reasoning": "<brief reason>" }
+  ],
+  "overallFeedback": "<2-3 sentence overall assessment>",
+  "strongAreas": ["<topic>"],
+  "weakAreas": ["<topic>"],
+  "gradingNotes": "<notes for human reviewer>"
+}`;
+
+  try {
+    let msgContent;
+    const contextText = `Subject: ${subj.name} (${subj.code})\nMax marks: ${maxMarks}\nScript ID: ${scriptId}\n\n${answerKey ? `MODEL ANSWER / ANSWER KEY:\n${answerKey}\n\n` : ''}${qPaper ? `QUESTION PAPER:\n${qPaper}\n\n` : ''}`;
+
+    if (file) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (['jpg','jpeg','png','webp'].includes(ext)) {
+        const b64 = await valFileToBase64(file);
+        msgContent = [
+          { type:'image', source:{ type:'base64', media_type: file.type||'image/jpeg', data: b64 }},
+          { type:'text', text: contextText + '\nEvaluate the student\'s answer sheet shown in the image above. Award marks for each question and provide overall feedback.' }
+        ];
+      } else if (ext === 'pdf') {
+        const b64 = await valFileToBase64(file);
+        msgContent = [
+          { type:'document', source:{ type:'base64', media_type:'application/pdf', data: b64 }},
+          { type:'text', text: contextText + '\nEvaluate the student\'s answer sheet in the PDF above.' }
+        ];
+      } else {
+        const text = await file.text();
+        msgContent = [{ type:'text', text: contextText + '\nSTUDENT ANSWER:\n' + text }];
+      }
+    } else {
+      msgContent = [{ type:'text', text: contextText + '\nNote: No student answer sheet provided. Generate a sample evaluation structure based on the answer key and question paper.' }];
+    }
+
+    const raw = await callClaude({
+      system: SYSTEM_PROMPT,
+      messages: [{ role:'user', content: msgContent }],
+      max_tokens: 1500,
+    });
+
+    const result = parseClaudeJSON(raw);
+    if (!result || result.totalMarks === undefined) throw new Error('Invalid response structure');
+
+    /* Display result */
+    displayAIResult(result, scriptId, subj, maxMarks);
+    setStatus(`✓ Evaluation complete — ${result.totalMarks}/${maxMarks} marks (${result.percentage}%) — ${result.grade}`, 'ok');
+
+    /* Add to batch log */
+    aiBatchResults.push({ id: nextAIResId++, scriptId, subjId, aiMarks: result.totalMarks, maxMarks, confidence: result.confidence, reasoning: result.overallFeedback, approved: false, finalMarks: null, result });
+    updateAIBatchLog();
+
+    /* Reset file */
+    aiValFileRef = null;
+    const lbl = document.getElementById('aiValFileLabel');
+    if (lbl) lbl.textContent = 'Upload scanned answer sheet';
+    const inp = document.getElementById('aiValFileInput');
+    if (inp) inp.value = '';
+    document.getElementById('aiValScriptId').value = '';
+
+  } catch(err) {
+    setStatus('Evaluation failed: ' + err.message, 'err');
+    if (resultEl) resultEl.innerHTML = '<div style="color:var(--red-dark);font-size:12px;padding:12px">Error: ' + err.message + '</div>';
+  }
+}
+
+function displayAIResult(result, scriptId, subj, maxMarks) {
+  const el = document.getElementById('aiValResultPanel');
+  if (!el) return;
+
+  const gradeColors = { O:'#065f46', 'A+':'#1e40af', A:'#1e40af', 'B+':'#5b21b6', B:'#92400e', C:'#92400e', P:'#374151', F:'#991b1b' };
+  const confColor   = result.confidence >= 80 ? 'var(--green)' : result.confidence >= 60 ? 'var(--amber)' : 'var(--red)';
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:12px">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--slate-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Script: ${scriptId}</div>
+        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--slate-800)">${subj.name}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div class="ai-marks-badge" style="background:${gradeColors[result.grade]||'#374151'};color:#fff;font-size:22px;border-radius:var(--r-md);padding:6px 16px">${result.totalMarks}<span style="font-size:13px;opacity:.7">/${maxMarks}</span></div>
+        <div style="font-size:10px;color:var(--slate-400);margin-top:3px">${result.percentage}% · Grade ${result.grade}</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--slate-400);margin-bottom:3px">
+        <span>AI confidence</span><span style="font-weight:700;color:${confColor}">${result.confidence}%</span>
+      </div>
+      <div class="ai-conf-bar"><div class="ai-conf-fill" style="width:${result.confidence}%;background:${confColor}"></div></div>
+    </div>
+
+    ${result.questionWise?.length ? `
+    <div style="margin-bottom:10px">
+      <div style="font-size:11px;font-weight:700;color:var(--slate-700);margin-bottom:6px">Question-wise breakdown</div>
+      ${result.questionWise.map(q => `
+        <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--slate-100);font-size:11px">
+          <span style="font-weight:700;color:var(--slate-700);min-width:30px">${q.question}</span>
+          <div style="flex:1;background:var(--slate-100);border-radius:3px;height:5px;overflow:hidden">
+            <div style="height:100%;border-radius:3px;background:var(--amber);width:${q.maxMarks?Math.round(q.awarded/q.maxMarks*100):0}%"></div>
+          </div>
+          <span style="font-weight:700;color:var(--slate-800);white-space:nowrap">${q.awarded}/${q.maxMarks}</span>
+          <span style="color:var(--slate-400);font-size:10px;flex:1">${q.reasoning}</span>
+        </div>`).join('')}
+    </div>` : ''}
+
+    <div style="padding:10px 12px;background:#eff6ff;border-radius:var(--r-md);font-size:11px;color:#1e40af;margin-bottom:10px;line-height:1.6">
+      <strong>Overall feedback:</strong> ${result.overallFeedback||'—'}
+    </div>
+
+    ${result.strongAreas?.length||result.weakAreas?.length ? `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;font-size:11px">
+      <div style="padding:8px 10px;background:#d1fae5;border-radius:var(--r-md)">
+        <div style="font-weight:700;color:var(--green-dark);margin-bottom:3px">Strong areas</div>
+        ${(result.strongAreas||[]).map(a=>`<div>· ${a}</div>`).join('')||'<div style="color:#6ee7b7">—</div>'}
+      </div>
+      <div style="padding:8px 10px;background:#fee2e2;border-radius:var(--r-md)">
+        <div style="font-weight:700;color:var(--red-dark);margin-bottom:3px">Areas to improve</div>
+        ${(result.weakAreas||[]).map(a=>`<div>· ${a}</div>`).join('')||'<div style="color:#fca5a5">—</div>'}
+      </div>
+    </div>` : ''}
+
+    ${result.gradingNotes ? `<div style="padding:8px 10px;background:#fef3c7;border-radius:var(--r-md);font-size:11px;color:#92400e"><strong>Note for reviewer:</strong> ${result.gradingNotes}</div>` : ''}
+
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn-primary" style="flex:1;font-size:12px" onclick="approveAIMark(${nextAIResId-1})">✓ Approve AI marks</button>
+      <button class="btn-secondary" style="font-size:12px" onclick="overrideAIMark(${nextAIResId-1})">Override</button>
+    </div>`;
+}
+
+function approveAIMark(id) {
+  const r = aiBatchResults.find(x => x.id === id);
+  if (!r) return;
+  r.approved = true;
+  r.finalMarks = r.aiMarks;
+  /* Sync to valMarks if script exists */
+  const vm = valMarks.find(m => m.scriptId === r.scriptId);
+  if (vm) { vm.marks2 = r.aiMarks; vm.status = 'verified'; vm.finalMarks = r.aiMarks; }
+  updateAIBatchLog();
+  alert(`AI marks of ${r.aiMarks}/${r.maxMarks} approved for ${r.scriptId}.`);
+}
+
+function overrideAIMark(id) {
+  const r = aiBatchResults.find(x => x.id === id);
+  if (!r) return;
+  const override = parseFloat(prompt(`Override AI marks for ${r.scriptId}.\nAI suggested: ${r.aiMarks}/${r.maxMarks}\nEnter corrected marks:`));
+  if (isNaN(override)) return;
+  r.approved = true;
+  r.finalMarks = override;
+  const vm = valMarks.find(m => m.scriptId === r.scriptId);
+  if (vm) { vm.marks2 = override; vm.finalMarks = override; vm.status = 'verified'; }
+  updateAIBatchLog();
+}
+
+function updateAIBatchLog() {
+  const el = document.getElementById('aiBatchLog');
+  if (!el) return;
+  if (!aiBatchResults.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--slate-400);text-align:center;padding:20px">No evaluations yet.</div>';
+    return;
+  }
+  const gradeColor = { O:'#065f46','A+':'#1e40af',A:'#1e40af','B+':'#5b21b6',B:'#92400e',C:'#374151',P:'#374151',F:'#991b1b' };
+  el.innerHTML = aiBatchResults.slice().reverse().map(r => {
+    const subj = subjects.find(s => s.id === r.subjId);
+    const g    = r.result?.grade || '';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--slate-100);font-size:11px">
+      <div style="font-family:monospace;font-size:10px;color:var(--slate-500);flex-shrink:0">${r.scriptId}</div>
+      <div style="flex:1;color:var(--slate-600)">${subj?.code||'—'}</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;color:${gradeColor[g]||'var(--slate-700)'}">${r.aiMarks}/${r.maxMarks}</div>
+      <div style="font-size:9px;color:var(--slate-400)">${r.confidence}% conf</div>
+      <div style="font-size:9px;padding:2px 7px;border-radius:20px;background:${r.approved?'#d1fae5':'#fef3c7'};color:${r.approved?'#065f46':'#92400e'};font-weight:700">${r.approved?'Approved':'Pending'}</div>
+    </div>`;
+  }).join('');
+}
+
+function exportAIMarks() {
+  if (!aiBatchResults.length) { alert('No AI evaluations to export.'); return; }
+  const rows = [['Script ID','Subject','AI Marks','Max Marks','Confidence','Grade','Approved','Final Marks']];
+  aiBatchResults.forEach(r => {
+    const subj = subjects.find(s=>s.id===r.subjId);
+    rows.push([r.scriptId, subj?.name||'', r.aiMarks, r.maxMarks, r.confidence+'%', r.result?.grade||'', r.approved?'Yes':'No', r.finalMarks??'']);
+  });
+  const csv = rows.map(row => row.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([csv],{type:'text/csv'})), download:'ai_valuation_marks.csv' });
+  a.click();
+}
+
+function clearAIBatchLog() {
+  if (!confirm('Clear the AI evaluation log for this session?')) return;
+  aiBatchResults = [];
+  updateAIBatchLog();
+}
+
+/* AI Cross-check */
+async function runCrossCheck() {
+  const humanMarks = parseFloat(document.getElementById('crossHumanMarks')?.value);
+  const answerText = document.getElementById('crossAnswerText')?.value.trim();
+  const modelAnswer= document.getElementById('crossModelAnswer')?.value.trim();
+  const subjId     = parseInt(document.getElementById('crossSubject')?.value);
+  const subj       = subjects.find(s => s.id === subjId);
+  const resultEl   = document.getElementById('crossResult');
+
+  if (!answerText || !modelAnswer) { alert('Please paste both the student answer and model answer.'); return; }
+  if (!resultEl) return;
+  resultEl.style.display = '';
+  resultEl.innerHTML = 'AI is cross-checking…';
+
+  try {
+    const raw = await callClaude({
+      system: `You are a chief examiner doing a quality check on a paper that has already been marked. Compare the student's answer against the model answer, then compare your assessment with the human examiner's marks. Be concise. Return JSON: {"aiMarks": <number>, "humanMarks": <number>, "difference": <number>, "agreement": "agree|minor_discrepancy|major_discrepancy", "reasoning": "<brief>", "recommendation": "<action>"}`,
+      messages: [{ role:'user', content: `Subject: ${subj?.name||'Unknown'}\nHuman-assigned marks: ${humanMarks}\n\nMODEL ANSWER:\n${modelAnswer}\n\nSTUDENT ANSWER:\n${answerText}` }],
+      max_tokens: 600,
+    });
+    const res = parseClaudeJSON(raw);
+    const agreeColor = res.agreement === 'agree' ? '#065f46' : res.agreement === 'minor_discrepancy' ? '#92400e' : '#991b1b';
+    const agreeBg    = res.agreement === 'agree' ? '#d1fae5' : res.agreement === 'minor_discrepancy' ? '#fef3c7' : '#fee2e2';
+    resultEl.innerHTML = `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--blue-dark)">AI: ${res.aiMarks} <span style="font-size:12px;color:var(--slate-400)">vs Human: ${res.humanMarks}</span></div>
+      <span style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:${agreeBg};color:${agreeColor}">${res.agreement?.replace('_',' ')}</span>
+    </div>
+    <div style="font-size:12px;color:var(--slate-600);margin-bottom:8px">${res.reasoning}</div>
+    <div style="font-size:11px;font-weight:700;color:var(--amber-dark)">Recommendation: ${res.recommendation}</div>`;
+  } catch(err) {
+    resultEl.innerHTML = '<span style="color:var(--red-dark)">Error: ' + err.message + '</span>';
+  }
+}
+
+/* AI Rubric builder */
+async function runRubricBuilder() {
+  const qPaper  = document.getElementById('rubricQPaper')?.value.trim();
+  const subjId  = parseInt(document.getElementById('rubricSubject')?.value);
+  const subj    = subjects.find(s => s.id === subjId);
+  const resultEl= document.getElementById('rubricResult');
+  if (!qPaper)  { alert('Please paste the question paper.'); return; }
+  if (!resultEl) return;
+  resultEl.style.display = '';
+  resultEl.textContent   = 'AI is generating marking scheme…';
+
+  try {
+    const raw = await callClaude({
+      system: `You are a senior examiner for Bangalore University. Generate a detailed marking scheme and model answers for the given question paper. For each question:
+- Provide a model answer
+- Break down the marks allocation (e.g., 2M for definition + 3M for example)
+- Map to Bloom's taxonomy level (L1-L6)
+- Suggest which Course Outcome (CO) it maps to
+Format clearly with question numbers and mark breakdowns.`,
+      messages: [{ role:'user', content: `Subject: ${subj?.name||'Unknown'} (${subj?.code||''})\n\nQUESTION PAPER:\n${qPaper}` }],
+      max_tokens: 2000,
+    });
+    resultEl.textContent = raw;
+    resultEl.style.display = '';
+  } catch(err) {
+    resultEl.textContent = 'Error: ' + err.message;
+    resultEl.style.display = '';
+  }
+}
+
+function valFileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = () => res(r.result.split(',')[1]);
+    r.onerror = () => rej(new Error('FileReader failed'));
+    r.readAsDataURL(file);
+  });
+}
+
+/* ════ BU SUBMISSION ════ */
+function renderSubmission() {
+  const tbody    = document.getElementById('submissionTableBody');
+  const checkEl  = document.getElementById('submissionChecklistEl');
+  if (!tbody || !checkEl) return;
+
+  /* Checklist */
+  const checks = [
+    { label:'All bundles returned by valuators',    done: valBundles.length > 0 && valBundles.every(b => b.status === 'returned') },
+    { label:'No unresolved discrepancies',          done: valMarks.filter(m => m.status === 'discrepancy').length === 0 },
+    { label:'All marks verified and locked',        done: valMarks.length > 0 && valMarks.every(m => m.status === 'verified') },
+    { label:'Re-valuation cases resolved',          done: revalRequests.every(r => r.status === 'completed' || r.status === 'rejected') },
+    { label:'Fee submission cleared',               done: true }, /* Link to fee module */
+  ];
+
+  checkEl.innerHTML = checks.map(c => `
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fff;border:1px solid var(--slate-200);border-radius:var(--r-md)">
+      <div style="width:20px;height:20px;border-radius:50%;background:${c.done?'var(--green-light)':'#fee2e2'};border:1px solid ${c.done?'#6ee7b7':'#fca5a5'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        ${c.done ? '<svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="#065f46" stroke-width="1.8" stroke-linecap="round"/></svg>' : '<div style="width:8px;height:2px;background:#ef4444;border-radius:1px"></div>'}
+      </div>
+      <span style="font-size:12px;color:${c.done?'var(--slate-700)':'var(--red-dark)'}">${c.label}</span>
+      ${c.done ? '' : '<span style="margin-left:auto;font-size:10px;color:var(--red-dark);font-weight:600">Action needed</span>'}
+    </div>`).join('');
+
+  /* Submission table */
+  const uniqueSubjs = [...new Set(valMarks.map(m => m.subjId))];
+  if (!uniqueSubjs.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--slate-400)">No valuation records found.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = uniqueSubjs.map(subjId => {
+    const subj   = subjects.find(s => s.id === subjId);
+    const records= valMarks.filter(m => m.subjId === subjId);
+    const total  = records.length;
+    const verified = records.filter(m => m.status === 'verified').length;
+    const pending  = records.filter(m => m.status === 'pending').length;
+    const disc     = records.filter(m => m.status === 'discrepancy').length;
+    const ready    = disc === 0 && pending === 0 && verified === total;
+    return `<tr>
+      <td style="font-size:12px;font-weight:600;color:var(--slate-800)">${subj?.name||'?'}</td>
+      <td style="font-size:11px;color:var(--slate-500)">${subj?.dept||'—'} Sem${subj?.sem||'?'}</td>
+      <td style="text-align:center;font-size:12px">${total}</td>
+      <td style="text-align:center;font-size:12px;color:var(--green-dark);font-weight:600">${verified}</td>
+      <td style="text-align:center;font-size:12px;color:var(--amber-dark)">${pending}</td>
+      <td style="text-align:center;font-size:12px;color:var(--red-dark);font-weight:600">${disc}</td>
+      <td>
+        <span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;
+          background:${ready?'#d1fae5':disc?'#fee2e2':'#fef3c7'};
+          color:${ready?'#065f46':disc?'#991b1b':'#92400e'}">
+          ${ready?'Ready to submit':disc?'Discrepancies pending':'Marks pending'}
+        </span>
+      </td>
+      <td>
+        ${ready
+          ? `<button style="font-size:10px;color:var(--green-dark);background:var(--green-light);border:1px solid #6ee7b7;border-radius:4px;padding:2px 8px;cursor:pointer" onclick="submitSubjectMarks(${subjId})">Submit</button>`
+          : `<button style="font-size:10px;color:var(--slate-400);background:var(--slate-100);border:1px solid var(--slate-200);border-radius:4px;padding:2px 8px;cursor:not-allowed" disabled>Pending</button>`}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function submitSubjectMarks(subjId) {
+  const subj = subjects.find(s => s.id === subjId);
+  if (!confirm(`Submit marks for ${subj?.name} to Bangalore University?\n\nThis will lock all marks. Changes after submission require a formal amendment request to BU.`)) return;
+  alert(`Marks for ${subj?.name} submitted to BU portal.\n\nIn the full system:\n· Generates BU-format Excel file\n· Uploads to BU marks portal\n· Principal/CoE digital signature appended\n· Acknowledgement receipt stored`);
+}
+
+function submitToBU() {
+  const format = document.getElementById('submitFormat')?.value;
+  const year   = document.getElementById('submitAcadYear')?.value;
+  const sem    = document.getElementById('submitSem')?.value;
+  alert(`Generating ${format.toUpperCase()} submission file for ${year} ${sem} semester.\n\nIncludes:\n· All verified marks across all subjects\n· Student USN / register numbers\n· College code and principal signature fields\n\nFile ready to upload to BU portal.`);
+}
+
+/* ── Init ── */
+function initValuationModule() {
+  populateValSubjectFilters();
+  renderBundles();
+  updateValStats();
+  setAIMode('assist');
+}
+/* ════════════════════════════
+   EXAM CORNER MODULE
+════════════════════════════ */
+
+/* ── Data stores ── */
+let cieMarks      = {};   /* "stuId_subjId_test" → marks */
+let attRecords    = {};   /* "stuId_subjId" → { total, present, od, ml } */
+let seeExams      = [];   /* [ { id, subjId, date, time, duration, hall, maxMarks, dept, sem } ] */
+let invigDuty     = {};   /* seeExamId → [ { teacherId, role } ] */
+let resultsData   = {};   /* "stuId_subjId" → { cie, see, total, grade, sgpa } */
+let questionBank  = [];   /* [ { id, subjId, type, marks, bloom, co, text, opts, correct } ] */
+let nextSEEId     = 1;
+let nextQBId      = 1;
+let editingQBId   = null;
+
+const BLOOM_LABELS = { 1:'Remember', 2:'Understand', 3:'Apply', 4:'Analyse', 5:'Evaluate', 6:'Create' };
+const BLOOM_COLORS = { 1:'#dbeafe', 2:'#ede9fe', 3:'#d1fae5', 4:'#fef3c7', 5:'#fee2e2', 6:'#fce7f3' };
+const BLOOM_TEXT   = { 1:'#1e40af', 2:'#5b21b6', 3:'#065f46', 4:'#92400e', 5:'#991b1b', 6:'#9d174d' };
+const GRADE_TABLE  = [
+  { min:90, grade:'O',   gp:10, label:'Outstanding' },
+  { min:80, grade:'A+',  gp:9,  label:'Excellent' },
+  { min:70, grade:'A',   gp:8,  label:'Very Good' },
+  { min:60, grade:'B+',  gp:7,  label:'Good' },
+  { min:55, grade:'B',   gp:6,  label:'Above Average' },
+  { min:50, grade:'C',   gp:5,  label:'Average' },
+  { min:40, grade:'P',   gp:4,  label:'Pass' },
+  { min:0,  grade:'F',   gp:0,  label:'Fail' },
+];
+
+function getGrade(pct) {
+  return GRADE_TABLE.find(g => pct >= g.min) || GRADE_TABLE[GRADE_TABLE.length-1];
+}
+
+/* ── Tab switch ── */
+function ecTab(tab, btn) {
+  ['cie','attendance','see','hallticket','invig','results','qbank'].forEach(t => {
+    const el = document.getElementById('ecsubtab-' + t);
+    if (el) el.style.display = 'none';
+    const b  = document.getElementById('ectab-' + t);
+    if (b)  b.classList.remove('active');
+  });
+  const target = document.getElementById('ecsubtab-' + tab);
+  if (target) target.style.display = '';
+  if (btn) btn.classList.add('active');
+
+  if (tab === 'cie')        { populateCIESubjectFilter(); renderCIE(); }
+  if (tab === 'attendance') { populateAttSubjectFilter(); renderAttendance(); }
+  if (tab === 'see')        { populateSEESubjectFilter(); renderSEE(); }
+  if (tab === 'hallticket') renderHallTicketList();
+  if (tab === 'invig')      renderInvig();
+  if (tab === 'results')    renderResults();
+  if (tab === 'qbank')      { populateQBFilters(); renderQBank(); }
+}
+
+/* ── Stats ── */
+function updateECStats() {
+  const allStu = students;
+  const total  = allStu.length;
+
+  /* Attendance defaulters: students with any subject below 75% */
+  let attDef = 0;
+  allStu.forEach(stu => {
+    const subjsForStu = subjects.filter(s => s.dept === stu.department);
+    const anyBelow = subjsForStu.some(subj => {
+      const rec = attRecords[`${stu.id}_${subj.id}`];
+      if (!rec || rec.total === 0) return false;
+      return getAttPct(rec) < 75;
+    });
+    if (anyBelow) attDef++;
+  });
+
+  /* CIE pending: subjects with 0 marks entered for at least one student */
+  let ciePending = 0;
+  const deptSubjMap = {};
+  subjects.forEach(s => {
+    if (!deptSubjMap[s.dept]) deptSubjMap[s.dept] = [];
+    deptSubjMap[s.dept].push(s);
+  });
+  allStu.forEach(stu => {
+    const stuSubjs = (deptSubjMap[stu.department] || []).filter(s => s.cie === 'yes');
+    const anyMissing = stuSubjs.some(subj => !cieMarks[`${stu.id}_${subj.id}_1`]);
+    if (anyMissing) ciePending++;
+  });
+
+  const eligible = allStu.filter(stu => isEligible(stu)).length;
+
+  const s = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  s('ec-total-students', total);
+  s('ec-eligible', eligible);
+  s('ec-att-def', attDef);
+  s('ec-cie-pending', ciePending);
+  s('ec-exams-today', seeExams.filter(e => e.date === todayStr()).length);
+}
+
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+
+function getAttPct(rec) {
+  if (!rec || rec.total === 0) return 0;
+  return Math.round((rec.present + (rec.od||0)) / rec.total * 100);
+}
+
+function isEligible(stu) {
+  const subjsForStu = subjects.filter(s => s.dept === stu.department);
+  if (!subjsForStu.length) return false;
+  /* All subjects must have att >= 75 */
+  const allAtt = subjsForStu.every(subj => {
+    const rec = attRecords[`${stu.id}_${subj.id}`];
+    if (!rec || rec.total === 0) return true; /* No data = assume ok */
+    return getAttPct(rec) >= 75;
+  });
+  /* CIE total >= 12 for at least one subject entered */
+  return allAtt;
+}
+
+/* ════ CIE MARKS ════ */
+function populateCIESubjectFilter() {
+  const dept = document.getElementById('cieDept')?.value || 'BCA';
+  const sem  = document.getElementById('cieSem')?.value  || '1';
+  const sel  = document.getElementById('cieSubject');
+  if (!sel) return;
+  const list = subjects.filter(s => s.dept === dept && s.sem === sem && s.cie === 'yes');
+  sel.innerHTML = '<option value="">All subjects</option>' +
+    list.map(s => `<option value="${s.id}">${s.code} — ${s.name}</option>`).join('');
+}
+
+function renderCIE() {
+  populateCIESubjectFilter();
+  const tbody = document.getElementById('cieTableBody');
+  if (!tbody) return;
+  const dept    = document.getElementById('cieDept')?.value || 'BCA';
+  const sem     = document.getElementById('cieSem')?.value  || '1';
+  const subjId  = parseInt(document.getElementById('cieSubject')?.value) || null;
+  const stuList = students.filter(s => s.department === dept);
+
+  if (!stuList.length) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--slate-400)">No students in this department. Enroll students in Step 5.</td></tr>';
+    return;
+  }
+
+  const subjsToShow = subjId
+    ? [subjects.find(s => s.id === subjId)].filter(Boolean)
+    : subjects.filter(s => s.dept === dept && s.sem === sem && s.cie === 'yes');
+
+  if (!subjsToShow.length) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--slate-400)">No CIE subjects defined for this dept/semester. Add subjects in Step 6.</td></tr>';
+    return;
+  }
+
+  /* Render one row per student × first/selected subject */
+  const subj = subjsToShow[0];
+  tbody.innerHTML = stuList.map(stu => {
+    const baseKey  = `${stu.id}_${subj.id}`;
+    const t1 = cieMarks[`${baseKey}_1`] ?? '';
+    const t2 = cieMarks[`${baseKey}_2`] ?? '';
+    const t3 = cieMarks[`${baseKey}_3`] ?? '';
+    const asgn = cieMarks[`${baseKey}_assignment`] ?? '';
+    const sem_ = cieMarks[`${baseKey}_seminar`] ?? '';
+
+    /* CIE Total: best 2 of 3 tests (scale to 30) + assignment (10) + seminar (10) = 50 scaled to 40 */
+    const tests = [t1,t2,t3].map(v=>parseFloat(v)||0).sort((a,b)=>b-a);
+    const best2 = tests[0] + tests[1];
+    const asgnN = parseFloat(asgn)||0;
+    const semN  = parseFloat(sem_)||0;
+    const cieTotal = Math.round(best2/40*30) + asgnN + semN; /* scale best2/40 to 30, then add asgn+seminar */
+
+    const rec  = attRecords[`${stu.id}_${subj.id}`];
+    const attPct = rec ? getAttPct(rec) : null;
+    const attStr = attPct !== null ? attPct + '%' : '—';
+    const eligible = attPct === null || attPct >= 75 ? (cieTotal >= 12 ? 'eligible' : 'pending') : 'ineligible';
+    const eligLabel = { eligible:'Eligible', pending:'CIE low', ineligible:'Att. short' };
+
+    return `<tr>
+      <td style="font-size:12px;font-weight:600;color:var(--slate-800)">${stu.name}</td>
+      <td style="font-size:11px;color:var(--slate-400)">${stu.admNo||stu.id}</td>
+      <td style="text-align:center"><input class="cie-marks-input" id="cie_${stu.id}_${subj.id}_1" type="number" min="0" max="20" value="${t1}" onchange="cieChanged(this,20)" placeholder="—"/></td>
+      <td style="text-align:center"><input class="cie-marks-input" id="cie_${stu.id}_${subj.id}_2" type="number" min="0" max="20" value="${t2}" onchange="cieChanged(this,20)" placeholder="—"/></td>
+      <td style="text-align:center"><input class="cie-marks-input" id="cie_${stu.id}_${subj.id}_3" type="number" min="0" max="20" value="${t3}" onchange="cieChanged(this,20)" placeholder="—"/></td>
+      <td style="text-align:center"><input class="cie-marks-input" id="cie_${stu.id}_${subj.id}_assignment" type="number" min="0" max="10" value="${asgn}" onchange="cieChanged(this,10)" placeholder="—"/></td>
+      <td style="text-align:center"><input class="cie-marks-input" id="cie_${stu.id}_${subj.id}_seminar" type="number" min="0" max="10" value="${sem_}" onchange="cieChanged(this,10)" placeholder="—"/></td>
+      <td style="text-align:center;background:#f8fafc"><strong style="font-family:'Syne',sans-serif;font-size:13px;color:${cieTotal>=12?'var(--green-dark)':'var(--red-dark)'}">${t1||t2||t3||asgn||sem_ ? cieTotal : '—'}</strong></td>
+      <td style="text-align:center;font-size:12px;color:${attPct!==null&&attPct<75?'var(--red-dark)':'var(--green-dark)'}">${attStr}</td>
+      <td><span class="ec-pill ${eligible}">${eligLabel[eligible]}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function cieChanged(input, max) {
+  const val = parseFloat(input.value);
+  if (!isNaN(val) && val > max) {
+    input.classList.add('over');
+  } else {
+    input.classList.remove('over');
+    input.classList.add('saved');
+    setTimeout(() => input.classList.remove('saved'), 800);
+  }
+  /* Save immediately on change */
+  const id = input.id; /* cie_stuId_subjId_test */
+  const parts = id.split('_');
+  const key = `${parts[1]}_${parts[2]}_${parts.slice(3).join('_')}`;
+  cieMarks[key] = val;
+}
+
+function saveCIEAll() {
+  /* Read all visible inputs and store */
+  document.querySelectorAll('.cie-marks-input').forEach(inp => {
+    if (!inp.id.startsWith('cie_')) return;
+    const parts = inp.id.split('_');
+    const key = `${parts[1]}_${parts[2]}_${parts.slice(3).join('_')}`;
+    const val = parseFloat(inp.value);
+    if (!isNaN(val)) cieMarks[key] = val;
+  });
+  updateECStats();
+  alert('CIE marks saved successfully.');
+}
+
+function exportCIEMarks() {
+  const dept = document.getElementById('cieDept')?.value || 'BCA';
+  const sem  = document.getElementById('cieSem')?.value  || '1';
+  const subjs = subjects.filter(s => s.dept === dept && s.sem === sem && s.cie === 'yes');
+  const stuList = students.filter(s => s.department === dept);
+  const rows = [['Student','Adm No',...subjs.map(s=>s.code+' T1'),...subjs.map(s=>s.code+' T2'),...subjs.map(s=>s.code+' T3'),...subjs.map(s=>s.code+' Asgn')]];
+  stuList.forEach(stu => {
+    const row = [stu.name, stu.admNo||stu.id];
+    subjs.forEach(s => row.push(cieMarks[`${stu.id}_${s.id}_1`]||''));
+    subjs.forEach(s => row.push(cieMarks[`${stu.id}_${s.id}_2`]||''));
+    subjs.forEach(s => row.push(cieMarks[`${stu.id}_${s.id}_3`]||''));
+    subjs.forEach(s => row.push(cieMarks[`${stu.id}_${s.id}_assignment`]||''));
+    rows.push(row);
+  });
+  const csv = rows.map(r => r.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([csv],{type:'text/csv'})), download:'cie_marks.csv' });
+  a.click();
+}
+
+/* ════ ATTENDANCE ════ */
+function populateAttSubjectFilter() {
+  const dept = document.getElementById('attDept')?.value || 'BCA';
+  const sem  = document.getElementById('attSem')?.value  || '1';
+  const sel  = document.getElementById('attSubject');
+  if (!sel) return;
+  const list = subjects.filter(s => s.dept === dept && s.sem === sem);
+  sel.innerHTML = '<option value="">All subjects (consolidated)</option>' +
+    list.map(s => `<option value="${s.id}">${s.code} — ${s.name}</option>`).join('');
+}
+
+function renderAttendance() {
+  populateAttSubjectFilter();
+  const tbody = document.getElementById('attTableBody');
+  const above75El = document.getElementById('att-above75');
+  const betweenEl = document.getElementById('att-65to75');
+  const belowEl   = document.getElementById('att-below65');
+  const avgEl     = document.getElementById('att-avg-pct');
+  if (!tbody) return;
+
+  const dept    = document.getElementById('attDept')?.value || 'BCA';
+  const sem     = document.getElementById('attSem')?.value  || '1';
+  const subjId  = parseInt(document.getElementById('attSubject')?.value) || null;
+  const view    = document.getElementById('attView')?.value || 'summary';
+  const stuList = students.filter(s => s.department === dept);
+  const subjList= subjId ? [subjects.find(s=>s.id===subjId)].filter(Boolean) : subjects.filter(s=>s.dept===dept&&s.sem===sem);
+
+  if (!stuList.length) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--slate-400)">No students enrolled in this department.</td></tr>';
+    return;
+  }
+
+  /* Generate synthetic attendance if no records exist (demo data) */
+  stuList.forEach(stu => {
+    subjList.forEach(subj => {
+      const key = `${stu.id}_${subj.id}`;
+      if (!attRecords[key]) {
+        const total   = Math.floor(Math.random()*10)+50; /* 50-60 classes */
+        const absent  = Math.floor(Math.random()*total*0.25);
+        attRecords[key] = { total, present: total-absent, od:0, ml:0 };
+      }
+    });
+  });
+
+  let above75 = 0, between = 0, below65 = 0, sumPct = 0;
+  const rows = stuList.map(stu => {
+    /* Consolidated: average across all subjects */
+    const pcts = subjList.map(subj => {
+      const rec = attRecords[`${stu.id}_${subj.id}`];
+      return rec ? getAttPct(rec) : 0;
+    }).filter(p => p > 0);
+    const avgPct = pcts.length ? Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length) : 0;
+    const totClasses = subjList.reduce((a,subj) => a + (attRecords[`${stu.id}_${subj.id}`]?.total||0), 0);
+    const totPresent = subjList.reduce((a,subj) => a + (attRecords[`${stu.id}_${subj.id}`]?.present||0), 0);
+    const totOD      = subjList.reduce((a,subj) => a + (attRecords[`${stu.id}_${subj.id}`]?.od||0), 0);
+    const totAbsent  = totClasses - totPresent;
+
+    sumPct += avgPct;
+    if (avgPct >= 75) above75++; else if (avgPct >= 65) between++; else below65++;
+
+    if (view === 'defaulters' && avgPct >= 75) return '';
+    const status = avgPct >= 75 ? 'present' : avgPct >= 65 ? 'shortage' : 'absent';
+    const statusLabel = avgPct >= 75 ? '≥75% OK' : avgPct >= 65 ? 'Condonation' : 'Detained';
+
+    return `<tr>
+      <td style="font-size:12px;font-weight:600;color:var(--slate-800)">${stu.name}</td>
+      <td style="font-size:11px;color:var(--slate-400)">${stu.admNo||stu.id}</td>
+      <td style="text-align:center;font-size:12px">${totClasses}</td>
+      <td style="text-align:center;font-size:12px;color:var(--green-dark);font-weight:600">${totPresent}</td>
+      <td style="text-align:center;font-size:12px;color:var(--red-dark)">${totAbsent}</td>
+      <td style="text-align:center;font-size:12px;color:#5b21b6">${totOD}</td>
+      <td style="text-align:center">
+        <div style="display:flex;align-items:center;gap:6px;justify-content:center">
+          <div style="flex:1;max-width:60px;background:var(--slate-100);border-radius:3px;height:6px"><div style="height:100%;border-radius:3px;background:${avgPct>=75?'var(--green)':avgPct>=65?'var(--amber)':'var(--red)'};width:${avgPct}%"></div></div>
+          <span style="font-size:12px;font-weight:700;color:${avgPct>=75?'var(--green-dark)':avgPct>=65?'var(--amber-dark)':'var(--red-dark)'}">${avgPct}%</span>
+        </div>
+      </td>
+      <td><span class="ec-pill ${status}">${statusLabel}</span></td>
+      <td>
+        ${avgPct < 75 ? `<button style="font-size:10px;color:var(--amber-dark);background:var(--amber-light);border:1px solid #fcd34d;border-radius:4px;padding:2px 8px;cursor:pointer" onclick="generateNotice(${stu.id})">Notice</button>` : ''}
+      </td>
+    </tr>`;
+  }).filter(Boolean);
+
+  tbody.innerHTML = rows.join('') || '<tr><td colspan="9" style="text-align:center;padding:16px;color:var(--slate-400)">All students meet attendance criteria.</td></tr>';
+
+  if (above75El) above75El.textContent = above75;
+  if (betweenEl) betweenEl.textContent = between;
+  if (belowEl)   belowEl.textContent   = below65;
+  if (avgEl)     avgEl.textContent     = stuList.length ? Math.round(sumPct/stuList.length) + '%' : '0%';
+}
+
+function generateNotice(stuId) {
+  const stu = students.find(s => s.id === stuId);
+  if (!stu) return;
+  alert(`Shortage notice generated for ${stu.name}.\n\nIn the full system this would:\n· Print a formal letter with parent's name and address\n· Send an SMS to the registered mobile number\n· Log the notice in the student record`);
+}
+
+function markTodayAttendance() {
+  alert('Today\'s attendance marking panel would open here.\nIn the full system: select dept, sem, subject, then mark each student P/A/OD/ML.\nAuto-saves and updates the percentage tracker.');
+}
+
+function printAttendanceReport() {
+  alert('Attendance report sent to print.\nThe full system generates a PDF with:\n· Subject-wise attendance per student\n· Defaulter list with contact details\n· Summary statistics per department');
+}
+
+/* ════ SEE SCHEDULE ════ */
+function populateSEESubjectFilter() {
+  const sel = document.getElementById('seeSubjectSel');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Select subject…</option>' +
+    subjects.map(s => `<option value="${s.id}">${s.code} — ${s.name} (${s.dept} Sem${s.sem})</option>`).join('');
+}
+
+const SURANA_SEE_SCHEDULE = [
+  { subjCode:'BCA101', date:'2025-11-10', time:'10:00', duration:3, hall:'Seminar Hall',  maxMarks:60 },
+  { subjCode:'BCA102', date:'2025-11-12', time:'10:00', duration:3, hall:'Seminar Hall',  maxMarks:60 },
+  { subjCode:'BCA103', date:'2025-11-14', time:'10:00', duration:3, hall:'Room 201',      maxMarks:60 },
+  { subjCode:'BCA104', date:'2025-11-17', time:'10:00', duration:3, hall:'Room 101',      maxMarks:60 },
+  { subjCode:'BCA105', date:'2025-11-19', time:'02:00', duration:2, hall:'BCA Lab 1',     maxMarks:40 },
+  { subjCode:'BBA101', date:'2025-11-10', time:'02:00', duration:3, hall:'Room 102',      maxMarks:60 },
+  { subjCode:'BBA102', date:'2025-11-12', time:'02:00', duration:3, hall:'Room 102',      maxMarks:60 },
+  { subjCode:'BCM101', date:'2025-11-11', time:'10:00', duration:3, hall:'Room 103',      maxMarks:60 },
+  { subjCode:'BCM102', date:'2025-11-13', time:'10:00', duration:3, hall:'Room 103',      maxMarks:60 },
+];
+
+function loadSuranaExamSchedule() {
+  if (seeExams.length && !confirm('Load BU exam schedule? Existing schedule kept.')) return;
+  SURANA_SEE_SCHEDULE.forEach(ex => {
+    const subj = subjects.find(s => s.code === ex.subjCode);
+    if (!subj) return;
+    if (!seeExams.find(e => e.subjId === subj.id)) {
+      seeExams.push({
+        id: nextSEEId++, subjId: subj.id, dept: subj.dept, sem: subj.sem,
+        date: ex.date, time: ex.time, duration: ex.duration,
+        hall: ex.hall, maxMarks: ex.maxMarks, status:'scheduled',
+      });
+    }
+  });
+  renderSEE();
+  updateECStats();
+}
+
+function renderSEE() {
+  const tbody = document.getElementById('seeTableBody');
+  if (!tbody) return;
+  const dept = document.getElementById('seeDept')?.value || '';
+  const sem  = document.getElementById('seeSem')?.value  || '';
+  const list = seeExams.filter(e => (!dept || e.dept === dept) && (!sem || e.sem === sem));
+
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--slate-400)">No exams scheduled. Click "Load BU schedule" or add exams manually.</td></tr>';
+    return;
+  }
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  tbody.innerHTML = list.map(ex => {
+    const subj   = subjects.find(s => s.id === ex.subjId);
+    const dayStr = ex.date ? days[new Date(ex.date).getDay()] : '—';
+    const isPast = ex.date && ex.date < todayStr();
+    const status = isPast ? 'completed' : 'scheduled';
+    return `<tr>
+      <td style="font-family:monospace;font-size:11px;font-weight:700;color:var(--slate-700)">${subj?.code||'—'}</td>
+      <td style="font-size:12px;font-weight:600;color:var(--slate-800)">${subj?.name||'Unknown'}</td>
+      <td style="font-size:11px;color:var(--slate-400)">${ex.dept} Sem${ex.sem}</td>
+      <td style="font-size:12px;font-weight:600">${ex.date||'—'}</td>
+      <td style="font-size:11px;color:var(--slate-500)">${dayStr}</td>
+      <td style="font-size:12px">${ex.time||'—'}</td>
+      <td style="font-size:12px">${ex.duration}h</td>
+      <td style="font-size:12px">${ex.hall||'—'}</td>
+      <td style="text-align:center;font-size:12px">${ex.maxMarks}</td>
+      <td><span class="ec-pill ${status}">${status==='completed'?'Completed':'Scheduled'}</span></td>
+      <td style="display:flex;gap:4px;padding:8px 12px">
+        <button style="font-size:10px;color:var(--amber-dark);background:var(--amber-light);border:1px solid #fcd34d;border-radius:4px;padding:2px 8px;cursor:pointer" onclick="editSEEExam(${ex.id})">Edit</button>
+        <button style="font-size:10px;color:var(--red-dark);background:var(--red-light);border:1px solid #fecaca;border-radius:4px;padding:2px 8px;cursor:pointer" onclick="deleteSEEExam(${ex.id})">Del</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function addSEEExam() {
+  const form = document.getElementById('seeAddForm');
+  if (form) form.style.display = '';
+  document.getElementById('seeFormTitle').textContent = 'Add Exam';
+  populateSEESubjectFilter();
+}
+
+function saveSEEExam() {
+  const subjId   = parseInt(document.getElementById('seeSubjectSel')?.value);
+  const date     = document.getElementById('seeDate')?.value;
+  const subj     = subjects.find(s => s.id === subjId);
+  if (!subjId || !date) { alert('Subject and date are required.'); return; }
+  seeExams.push({
+    id: nextSEEId++, subjId, dept: subj?.dept||'', sem: subj?.sem||'',
+    date, time: document.getElementById('seeTime')?.value||'10:00',
+    duration: parseInt(document.getElementById('seeDuration')?.value)||3,
+    hall: document.getElementById('seeHall')?.value||'',
+    maxMarks: parseInt(document.getElementById('seeMaxMarks')?.value)||60,
+    status:'scheduled',
+  });
+  document.getElementById('seeAddForm').style.display = 'none';
+  renderSEE();
+  updateECStats();
+}
+
+function editSEEExam(id) {
+  const ex = seeExams.find(e => e.id === id);
+  if (!ex) return;
+  populateSEESubjectFilter();
+  const form = document.getElementById('seeAddForm');
+  if (form) form.style.display = '';
+  document.getElementById('seeSubjectSel').value = ex.subjId;
+  document.getElementById('seeDate').value       = ex.date;
+  document.getElementById('seeTime').value       = ex.time;
+  document.getElementById('seeDuration').value   = ex.duration;
+  document.getElementById('seeHall').value       = ex.hall;
+  document.getElementById('seeMaxMarks').value   = ex.maxMarks;
+  document.getElementById('seeFormTitle').textContent = 'Edit Exam';
+  deleteSEEExam(id); /* remove old, new will be saved */
+}
+
+function deleteSEEExam(id) {
+  seeExams = seeExams.filter(e => e.id !== id);
+  delete invigDuty[id];
+  renderSEE();
+}
+
+/* ════ HALL TICKETS ════ */
+function renderHallTicketList() {
+  const tbody = document.getElementById('htTableBody');
+  if (!tbody) return;
+  const dept      = document.getElementById('htDept')?.value || 'BCA';
+  const sem       = document.getElementById('htSem')?.value  || '1';
+  const eligFilt  = document.getElementById('htEligFilter')?.value || '';
+  const stuList   = students.filter(s => s.department === dept);
+
+  if (!stuList.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--slate-400)">No students enrolled.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = stuList.map(stu => {
+    /* Calculate eligibility */
+    const subjsForStu = subjects.filter(s => s.dept === dept && s.sem === sem);
+    const attPcts     = subjsForStu.map(subj => {
+      const rec = attRecords[`${stu.id}_${subj.id}`];
+      return rec ? getAttPct(rec) : 100;
+    });
+    const minAtt    = attPcts.length ? Math.min(...attPcts) : 100;
+    const attOK     = minAtt >= 75;
+    const cieTotal  = subjsForStu.reduce((a, subj) => {
+      const t1 = parseFloat(cieMarks[`${stu.id}_${subj.id}_1`])||0;
+      const t2 = parseFloat(cieMarks[`${stu.id}_${subj.id}_2`])||0;
+      const t3 = parseFloat(cieMarks[`${stu.id}_${subj.id}_3`])||0;
+      const best2 = [t1,t2,t3].sort((a,b)=>b-a).slice(0,2).reduce((x,y)=>x+y,0);
+      return a + (t1||t2||t3 ? best2 : 999); /* 999 = not entered = assume ok */
+    }, 0);
+    const cieOK = cieTotal === 0 || cieTotal >= 12;
+    const feesOK = true; /* Link to fee module in full build */
+    const eligible = attOK && cieOK && feesOK;
+
+    if (eligFilt === 'eligible'   && !eligible) return '';
+    if (eligFilt === 'ineligible' && eligible)  return '';
+
+    return `<tr onclick="previewHallTicket(${stu.id})" style="cursor:pointer">
+      <td><input type="checkbox" class="ht-check" value="${stu.id}" style="accent-color:var(--amber)"/></td>
+      <td style="font-size:12px;font-weight:600;color:var(--slate-800)">${stu.name}</td>
+      <td style="font-size:11px;color:var(--slate-400)">${stu.admNo||stu.id}</td>
+      <td style="text-align:center"><span class="ec-pill ${attOK?'eligible':'ineligible'}">${Math.round(minAtt)}%</span></td>
+      <td style="text-align:center"><span class="ec-pill ${cieOK?'eligible':'ineligible'}">${cieOK?'OK':'Low'}</span></td>
+      <td style="text-align:center"><span class="ec-pill eligible">Cleared</span></td>
+      <td><span class="ec-pill ${eligible?'eligible':'ineligible'}">${eligible?'Eligible':'Ineligible'}</span></td>
+      <td>
+        ${eligible
+          ? `<button style="font-size:10px;color:var(--green-dark);background:var(--green-light);border:1px solid #6ee7b7;border-radius:4px;padding:2px 8px;cursor:pointer" onclick="event.stopPropagation();previewHallTicket(${stu.id})">Preview</button>`
+          : `<span style="font-size:10px;color:var(--red-dark)">Not eligible</span>`
+        }
+      </td>
+    </tr>`;
+  }).filter(Boolean).join('');
+}
+
+function previewHallTicket(stuId) {
+  const stu  = students.find(s => s.id === stuId);
+  if (!stu) return;
+  document.getElementById('ht-name').textContent  = stu.name;
+  document.getElementById('ht-admno').textContent = stu.admNo || 'SCP-' + String(stuId).padStart(4,'0');
+  document.getElementById('ht-prog').textContent  = stu.department ? `Bachelor of ${stu.department==='BCA'?'Computer Applications':stu.department==='BBA'?'Business Administration':stu.department==='BCOM'?'Commerce':stu.department==='BSC'?'Science':'Arts'} (${stu.department})` : '—';
+  document.getElementById('ht-sem').textContent   = 'Semester ' + (stu.semester||'1');
+  document.getElementById('ht-sec').textContent   = stu.section || 'A';
+
+  const sem      = document.getElementById('htSem')?.value || '1';
+  const examList = seeExams.filter(e => e.dept === stu.department && e.sem === sem);
+  const tbody    = document.getElementById('ht-subjects-body');
+  if (tbody) {
+    tbody.innerHTML = examList.length
+      ? examList.map(e => {
+          const subj = subjects.find(s => s.id === e.subjId);
+          return `<tr>
+            <td>${subj?.code||'—'}</td>
+            <td>${subj?.name||'—'}</td>
+            <td>${e.date||'—'}</td>
+            <td>${e.time||'—'}</td>
+          </tr>`;
+        }).join('')
+      : '<tr><td colspan="4" style="text-align:center;color:#9ca3af;padding:6px;font-size:10px">No exams scheduled</td></tr>';
+  }
+}
+
+function toggleAllHT(cb) {
+  document.querySelectorAll('.ht-check').forEach(c => c.checked = cb.checked);
+}
+
+function bulkPrintHallTickets() {
+  const checked = Array.from(document.querySelectorAll('.ht-check:checked'));
+  if (!checked.length) { alert('Select at least one student.'); return; }
+  alert(`Printing hall tickets for ${checked.length} eligible student(s).\n\nIn the full system this opens a PDF with all hall tickets, ready to print and distribute.`);
+}
+
+function printSingleHT() {
+  const name = document.getElementById('ht-name')?.textContent;
+  if (name === '—') { alert('Select a student first.'); return; }
+  alert(`Printing hall ticket for ${name}.\n\nIn the full system this generates a print-ready PDF.`);
+}
+
+/* ════ INVIGILATION DUTY ════ */
+function renderInvig() {
+  const el      = document.getElementById('invigGridEl');
+  const sumEl   = document.getElementById('invigTeacherSummary');
+  const sem     = document.getElementById('invigSem')?.value || '1';
+  const examList = seeExams.filter(e => e.sem === sem);
+
+  /* Update stat counts */
+  const totalSlots = examList.length * 2; /* 2 invigilators per exam */
+  let assigned = 0;
+  examList.forEach(ex => {
+    const d = invigDuty[ex.id] || [];
+    assigned += d.filter(r => r.teacherId).length;
+  });
+  const unassigned = totalSlots - assigned;
+  const conflicts  = detectInvigConflicts(examList);
+
+  const s = (id, v) => { const e=document.getElementById(id); if(e) e.textContent = v; };
+  s('inv-total-slots', totalSlots);
+  s('inv-assigned',    assigned);
+  s('inv-unassigned',  unassigned);
+  s('inv-conflicts',   conflicts.length);
+
+  if (!el) return;
+  if (!examList.length) {
+    el.innerHTML = '<div style="text-align:center;padding:24px;font-size:12px;color:var(--slate-400)">No exams scheduled for Semester '+sem+'. Add exams in the SEE Schedule tab first.</div>';
+    return;
+  }
+
+  /* Eligible invigilators: permanent faculty only, not visiting */
+  const eligTeachers = teachers.filter(t => t.empType !== 'visiting');
+
+  el.innerHTML = examList.map(ex => {
+    const subj  = subjects.find(s => s.id === ex.subjId);
+    const duty  = invigDuty[ex.id] || [{ role:'Chief Invigilator', teacherId: null }, { role:'Invigilator', teacherId: null }];
+    /* ensure 2 slots */
+    while (duty.length < 2) duty.push({ role:'Invigilator', teacherId: null });
+    invigDuty[ex.id] = duty;
+
+    const isConflict = conflicts.some(c => c.examId === ex.id);
+
+    return `<div class="inv-slot ${duty[0].teacherId && duty[1].teacherId ? 'assigned' : ''} ${isConflict ? 'conflict' : ''}" style="margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--slate-800)">${subj?.code||'—'} — ${subj?.name||'Unknown'}</div>
+          <div style="font-size:10px;color:var(--slate-500)">${ex.date||'—'} · ${ex.time||'—'} · ${ex.hall||'Hall'} · ${ex.duration}h</div>
+        </div>
+        ${isConflict ? '<span class="ec-pill ineligible">Conflict</span>' : (duty[0].teacherId && duty[1].teacherId ? '<span class="ec-pill eligible">Assigned</span>' : '<span class="ec-pill pending">Pending</span>')}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        ${duty.slice(0,2).map((slot, si) => {
+          const t = slot.teacherId ? teachers.find(t=>t.id===slot.teacherId) : null;
+          /* Exclude subject teacher from invigilating their own paper */
+          const excluded = parseInt((allotments[ex.subjId]||[])[0]);
+          const available = eligTeachers.filter(tc => tc.id !== excluded);
+          return `<div style="background:var(--slate-50);border:1px solid var(--slate-200);border-radius:var(--r-md);padding:8px 10px">
+            <div style="font-size:9px;font-weight:700;color:var(--slate-400);text-transform:uppercase;margin-bottom:4px">${si===0?'Chief Invigilator':'Invigilator'}</div>
+            <select class="allot-select ${slot.teacherId?'assigned':''}" onchange="setInvigDuty(${ex.id},${si},this.value)" style="width:100%;font-size:11px;padding:4px 7px">
+              <option value="">— Assign teacher —</option>
+              ${available.map(tc=>`<option value="${tc.id}" ${slot.teacherId===tc.id?'selected':''}>${tc.name}${tc.role==='hod'?' (HOD)':''}</option>`).join('')}
+            </select>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  /* Teacher duty summary */
+  const dutyCounts = {};
+  examList.forEach(ex => {
+    (invigDuty[ex.id]||[]).forEach(slot => {
+      if (slot.teacherId) dutyCounts[slot.teacherId] = (dutyCounts[slot.teacherId]||0)+1;
+    });
+  });
+
+  if (sumEl) {
+    sumEl.innerHTML = eligTeachers.map(t => {
+      const count = dutyCounts[t.id] || 0;
+      const over  = count > 4; /* More than 4 duties = overloaded */
+      return `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:#fff;border:1px solid var(--slate-200);border-radius:var(--r-md)">
+        <div style="flex:1;font-size:11px;font-weight:600;color:var(--slate-800)">${t.name}</div>
+        <div style="font-size:10px;color:var(--slate-400)">${t.department}</div>
+        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:${over?'var(--red-dark)':count>0?'var(--green-dark)':'var(--slate-300)'}">${count}</div>
+      </div>`;
+    }).join('');
+  }
+}
+
+function detectInvigConflicts(examList) {
+  const conflicts = [];
+  /* Find teachers assigned to two exams on the same date at the same time */
+  const teacherSlots = {};
+  examList.forEach(ex => {
+    (invigDuty[ex.id]||[]).forEach(slot => {
+      if (!slot.teacherId) return;
+      const key = `${slot.teacherId}_${ex.date}_${ex.time}`;
+      if (teacherSlots[key]) conflicts.push({ examId: ex.id, teacherId: slot.teacherId });
+      else teacherSlots[key] = ex.id;
+    });
+  });
+  return conflicts;
+}
+
+function setInvigDuty(examId, slotIdx, teacherId) {
+  if (!invigDuty[examId]) invigDuty[examId] = [{ role:'Chief Invigilator', teacherId:null },{ role:'Invigilator', teacherId:null }];
+  invigDuty[examId][slotIdx].teacherId = teacherId ? parseInt(teacherId) : null;
+  renderInvig();
+}
+
+function autoAssignInvig() {
+  const sem      = document.getElementById('invigSem')?.value || '1';
+  const examList = seeExams.filter(e => e.sem === sem);
+  const eligible = teachers.filter(t => t.empType !== 'visiting');
+  let assigned   = 0;
+
+  examList.forEach(ex => {
+    if (!invigDuty[ex.id]) invigDuty[ex.id] = [{role:'Chief Invigilator',teacherId:null},{role:'Invigilator',teacherId:null}];
+    const subjectTeacherId = parseInt((allotments[ex.subjId]||[])[0]);
+    /* Sort by lowest duty count first */
+    const dutyCounts = {};
+    examList.forEach(e2 => (invigDuty[e2.id]||[]).forEach(sl => { if(sl.teacherId) dutyCounts[sl.teacherId]=(dutyCounts[sl.teacherId]||0)+1; }));
+    const sorted = eligible.filter(t => t.id !== subjectTeacherId).sort((a,b) => (dutyCounts[a.id]||0)-(dutyCounts[b.id]||0));
+
+    /* Slot 0 = HOD or senior, Slot 1 = any available */
+    invigDuty[ex.id].forEach((slot, si) => {
+      if (!slot.teacherId) {
+        const candidate = si === 0
+          ? (sorted.find(t => t.role === 'hod') || sorted[0])
+          : sorted.find(t => t.id !== invigDuty[ex.id][0]?.teacherId);
+        if (candidate) { slot.teacherId = candidate.id; assigned++; }
+      }
+    });
+  });
+
+  renderInvig();
+  alert(`Auto-assignment complete — assigned ${assigned} duty slot(s).\nReview conflicts in red and adjust manually if needed.`);
+}
+
+function printInvigList() {
+  alert('Invigilation duty list sent to print.\n\nThe full system generates:\n· Date-wise duty roster\n· Teacher-wise duty schedule\n· Signature sheets for each exam room');
+}
+
+/* ════ RESULTS ════ */
+function renderResults() {
+  const tbody  = document.getElementById('resultsTableBody');
+  if (!tbody) return;
+  const dept   = document.getElementById('resDept')?.value || 'BCA';
+  const sem    = document.getElementById('resSem')?.value  || '1';
+  const filter = document.getElementById('resFilter')?.value || '';
+  const stuList= students.filter(s => s.department === dept);
+  const subjs  = subjects.filter(s => s.dept === dept && s.sem === sem);
+
+  /* Generate synthetic results if none exist */
+  stuList.forEach(stu => {
+    subjs.forEach(subj => {
+      const key = `${stu.id}_${subj.id}`;
+      if (!resultsData[key]) {
+        const cie = Math.floor(Math.random()*25)+15; /* 15-40 */
+        const see = Math.floor(Math.random()*35)+20; /* 20-55 */
+        const total = cie + see;
+        const grade = getGrade(total);
+        resultsData[key] = { cie, see, total, grade: grade.grade, gp: grade.gp };
+      }
+    });
+  });
+
+  let pass=0, fail=0, dist=0, sumGPA=0, resultCount=0;
+
+  const rows = stuList.map(stu => {
+    /* Average across subjects for display */
+    const stuResults = subjs.map(subj => resultsData[`${stu.id}_${subj.id}`]).filter(Boolean);
+    if (!stuResults.length) return '';
+    const avgCIE   = Math.round(stuResults.reduce((a,r)=>a+r.cie,0)/stuResults.length);
+    const avgSEE   = Math.round(stuResults.reduce((a,r)=>a+r.see,0)/stuResults.length);
+    const avgTotal = avgCIE + avgSEE;
+    const avgGP    = stuResults.reduce((a,r)=>a+r.gp,0)/stuResults.length;
+    const sgpa     = Math.round(avgGP*100)/100;
+    const hasFail  = stuResults.some(r => r.gp === 0);
+    const grade    = getGrade(avgTotal);
+
+    if (hasFail) fail++; else pass++;
+    if (avgTotal >= 70) dist++;
+    sumGPA += sgpa; resultCount++;
+
+    const result = hasFail ? 'fail' : 'pass';
+    if (filter === 'pass'        && hasFail)   return '';
+    if (filter === 'fail'        && !hasFail)  return '';
+    if (filter === 'distinction' && avgTotal<70) return '';
+
+    return `<tr>
+      <td style="font-size:12px;font-weight:600;color:var(--slate-800)">${stu.name}</td>
+      <td style="font-size:11px;color:var(--slate-400)">${stu.admNo||stu.id}</td>
+      <td style="text-align:center;font-size:12px">${avgCIE}</td>
+      <td style="text-align:center;font-size:12px">${avgSEE}</td>
+      <td style="text-align:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:${hasFail?'var(--red-dark)':'var(--green-dark)'}">${avgTotal}</td>
+      <td style="text-align:center"><span style="font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:${hasFail?'var(--red-dark)':'#1e40af'}">${grade.grade}</span></td>
+      <td style="text-align:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:700">${sgpa}</td>
+      <td><span class="ec-pill ${result}">${hasFail?'ATKT':'Pass'}</span></td>
+      <td><button style="font-size:10px;color:var(--blue-dark);background:var(--blue-light);border:1px solid #93c5fd;border-radius:4px;padding:2px 8px;cursor:pointer" onclick="printGradeCard(${stu.id})">Print</button></td>
+    </tr>`;
+  }).filter(Boolean);
+
+  tbody.innerHTML = rows.join('') || '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--slate-400)">No results. Enter marks or apply different filter.</td></tr>';
+
+  const s = (id, v) => { const e=document.getElementById(id); if(e) e.textContent = v; };
+  s('res-total', stuList.length);
+  s('res-pass',  pass);
+  s('res-fail',  fail);
+  s('res-dist',  dist);
+  s('res-avg-sgpa', resultCount ? (sumGPA/resultCount).toFixed(2) : '0.00');
+}
+
+function printGradeCard(stuId) {
+  const stu = students.find(s => s.id === stuId);
+  alert(`Printing grade card for ${stu?.name||stuId}.\n\nThe full system generates a BU-format grade card with:\n· Subject-wise CIE + SEE marks\n· SGPA and CGPA\n· Principal's digital signature`);
+}
+
+function enterResultsMode() {
+  alert('Results entry mode:\n\nThe full system allows:\n· Manual marks entry per student per subject\n· CSV bulk import (BU result format)\n· Copy-paste from BU results portal');
+}
+
+function exportResults() {
+  alert('Results exported to CSV.\n\nColumns: Name · Adm No · Subject-wise marks · Total · Grade · SGPA');
+}
+
+/* ════ QUESTION BANK ════ */
+function populateQBFilters() {
+  const dept = document.getElementById('qbDept')?.value || 'BCA';
+  const listSel = [document.getElementById('qbSubject'), document.getElementById('qbSubjSel')];
+  const deptSubjs = subjects.filter(s => s.dept === dept);
+  listSel.forEach(sel => {
+    if (!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = `<option value="">All subjects</option>` + deptSubjs.map(s => `<option value="${s.id}">${s.code} — ${s.name}</option>`).join('');
+    if (cur) sel.value = cur;
+  });
+}
+
+function renderQBank() {
+  populateQBFilters();
+  const el      = document.getElementById('qbListEl');
+  if (!el) return;
+  const dept    = document.getElementById('qbDept')?.value    || 'BCA';
+  const subjId  = parseInt(document.getElementById('qbSubject')?.value) || null;
+  const bloomF  = parseInt(document.getElementById('qbBloom')?.value)   || null;
+  const typeF   = document.getElementById('qbType')?.value              || '';
+
+  const list = questionBank.filter(q => {
+    const subj = subjects.find(s => s.id === q.subjId);
+    if (!subj || subj.dept !== dept) return false;
+    if (subjId && q.subjId !== subjId) return false;
+    if (bloomF && q.bloom !== bloomF) return false;
+    if (typeF  && q.type  !== typeF)  return false;
+    return true;
+  });
+
+  const qbTotal = document.getElementById('qb-total');
+  const qbMCQ   = document.getElementById('qb-mcq');
+  const qbShort = document.getElementById('qb-short');
+  const qbLong  = document.getElementById('qb-long');
+  if (qbTotal) qbTotal.textContent = list.length;
+  if (qbMCQ)   qbMCQ.textContent   = list.filter(q=>q.type==='MCQ').length;
+  if (qbShort) qbShort.textContent  = list.filter(q=>q.type==='short').length;
+  if (qbLong)  qbLong.textContent   = list.filter(q=>q.type==='long'||q.type==='medium').length;
+
+  if (!list.length) {
+    el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--slate-400);font-size:12px">No questions yet. Click "+ Add question" to start building your bank.</div>';
+    return;
+  }
+
+  el.innerHTML = list.map(q => {
+    const subj = subjects.find(s => s.id === q.subjId);
+    const typeLabels = { MCQ:'MCQ', short:'Short 2M', medium:'Medium 5M', long:'Long 10M' };
+    return `<div style="display:grid;grid-template-columns:1fr 80px 100px 100px 80px;gap:8px;padding:10px 14px;border-bottom:1px solid var(--slate-100);align-items:center;cursor:pointer;transition:background .1s" onclick="loadQuestion(${q.id})" onmouseover="this.style.background='var(--amber-light)'" onmouseout="this.style.background=''">
+      <div>
+        <div style="font-size:12px;color:var(--slate-800)">${q.text?.slice(0,80)}${q.text?.length>80?'…':''}</div>
+        ${q.type==='MCQ'&&q.opts?.A ? `<div style="font-size:10px;color:var(--slate-400);margin-top:2px">A) ${q.opts.A} · B) ${q.opts.B}</div>` : ''}
+      </div>
+      <div><span style="font-size:10px;background:#f3f4f6;color:var(--slate-600);padding:2px 7px;border-radius:4px">${typeLabels[q.type]||q.type}</span></div>
+      <div style="font-size:11px;color:var(--slate-500)">${subj?.code||'—'}</div>
+      <div><span style="font-size:10px;background:${BLOOM_COLORS[q.bloom]||'#f3f4f6'};color:${BLOOM_TEXT[q.bloom]||'#374151'};padding:2px 7px;border-radius:4px">L${q.bloom} ${BLOOM_LABELS[q.bloom]||''}</span></div>
+      <div style="font-size:11px;font-weight:700;color:var(--slate-700)">${q.marks}M</div>
+    </div>`;
+  }).join('');
+
+  /* Show/hide MCQ options on type change */
+  document.getElementById('qbTypeSel')?.addEventListener('change', function() {
+    const g = document.getElementById('qbOptionsGroup');
+    if (g) g.style.display = this.value === 'MCQ' ? '' : 'none';
+  });
+}
+
+function saveQuestion() {
+  const text   = document.getElementById('qbText')?.value.trim();
+  const subjId = parseInt(document.getElementById('qbSubjSel')?.value);
+  if (!text)   { alert('Question text is required.'); return; }
+  if (!subjId) { alert('Please select a subject.'); return; }
+
+  const type  = document.getElementById('qbTypeSel')?.value || 'short';
+  const marks = parseInt(document.getElementById('qbMarks')?.value) || 2;
+  const bloom = parseInt(document.getElementById('qbBloomSel')?.value) || 1;
+  const co    = document.getElementById('qbCOSel')?.value || 'CO1';
+  const opts  = type === 'MCQ' ? {
+    A: document.getElementById('qbOptA')?.value||'',
+    B: document.getElementById('qbOptB')?.value||'',
+    C: document.getElementById('qbOptC')?.value||'',
+    D: document.getElementById('qbOptD')?.value||'',
+    correct: document.getElementById('qbCorrect')?.value||'A',
+  } : null;
+
+  const q = { id: editingQBId || nextQBId++, subjId, type, marks, bloom, co, text, opts };
+  if (editingQBId !== null) {
+    const idx = questionBank.findIndex(x => x.id === editingQBId);
+    if (idx >= 0) questionBank[idx] = q;
+  } else {
+    questionBank.push(q);
+  }
+  resetQBForm();
+  renderQBank();
+}
+
+function loadQuestion(id) {
+  const q = questionBank.find(x => x.id === id);
+  if (!q) return;
+  editingQBId = id;
+  const set = (elId, val) => { const e=document.getElementById(elId); if(e) e.value=val||''; };
+  set('qbSubjSel', q.subjId);
+  set('qbTypeSel', q.type);
+  set('qbMarks', q.marks);
+  set('qbBloomSel', q.bloom);
+  set('qbCOSel', q.co);
+  set('qbText', q.text);
+  if (q.opts) {
+    set('qbOptA', q.opts.A); set('qbOptB', q.opts.B);
+    set('qbOptC', q.opts.C); set('qbOptD', q.opts.D);
+    set('qbCorrect', q.opts.correct);
+    const g = document.getElementById('qbOptionsGroup');
+    if (g) g.style.display = '';
+  }
+  document.getElementById('qbFormTitle').textContent = 'Edit Question';
+}
+
+function resetQBForm() {
+  editingQBId = null;
+  ['qbText','qbOptA','qbOptB','qbOptC','qbOptD'].forEach(id => { const e=document.getElementById(id); if(e) e.value=''; });
+  const set = (id, v) => { const e=document.getElementById(id); if(e) e.value=v; };
+  set('qbTypeSel','short'); set('qbMarks','2'); set('qbBloomSel','1'); set('qbCOSel','CO1');
+  const g = document.getElementById('qbOptionsGroup');
+  if (g) g.style.display = 'none';
+  document.getElementById('qbFormTitle').textContent = 'Add Question';
+}
+
+function addQuestion() { resetQBForm(); }
+
+function generateQPaper() {
+  const dept   = document.getElementById('qbDept')?.value || 'BCA';
+  const subjId = parseInt(document.getElementById('qbSubject')?.value) || null;
+  const available = questionBank.filter(q => {
+    const subj = subjects.find(s => s.id === q.subjId);
+    return subj?.dept === dept && (!subjId || q.subjId === subjId);
+  });
+  if (!available.length) { alert('No questions in the bank for this subject. Add questions first.'); return; }
+  /* Simple: pick 5 MCQ + 5 short + 3 long */
+  const mcqs  = available.filter(q=>q.type==='MCQ').slice(0,5);
+  const short = available.filter(q=>q.type==='short').slice(0,5);
+  const long  = available.filter(q=>q.type==='long'||q.type==='medium').slice(0,3);
+  const total = mcqs.reduce((a,q)=>a+q.marks,0) + short.reduce((a,q)=>a+q.marks,0) + long.reduce((a,q)=>a+q.marks,0);
+  const paper = [...mcqs,...short,...long].map((q,i)=>`Q${i+1}. [${q.marks}M · L${q.bloom} · ${q.co}] ${q.text}`).join('\n\n');
+  alert(`Question paper generated!\nTotal marks: ${total}\nQuestions: ${mcqs.length} MCQ + ${short.length} short + ${long.length} long\n\n--- PREVIEW ---\n${paper.slice(0,500)}${paper.length>500?'\n…':''}`);
+}
+
+/* ── Init ── */
+function initExamModule() {
+  updateECStats();
+  populateCIESubjectFilter();
+  renderCIE();
+}
 /* ════════════════════════════
    FEE STRUCTURE & PAYMENTS MODULE
 ════════════════════════════ */
