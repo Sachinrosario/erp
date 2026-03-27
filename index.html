@@ -5078,7 +5078,7 @@ body{
             <div style="font-size:11px;color:var(--slate-500);line-height:1.8">
               Controller of Examinations: BU Jnanabharathi<br>
               Phone: 080-2296-1021<br>
-              Email: coe@bangaloreuniversity.ac.in
+              Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="462529230624272821272a29342333282f302334352f323f682725682f28">[email&#160;protected]</a>
             </div>
           </div>
         </div>
@@ -5091,30 +5091,392 @@ body{
 
 
   <!-- ══ PO-CO MAPPING ══ -->
+
+  <!-- ══ PO-CO MAPPING ══ -->
   <div class="page" id="page-po-co-mapping" style="display:none">
-    <div style="padding:22px 26px">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
-        <div class="card" style="padding:20px;border-left:4px solid #8b5cf6">
-          <div style="font-size:11px;font-weight:700;color:var(--slate-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Programme Outcomes</div>
-          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--slate-900);margin-bottom:4px">Define POs</div>
-          <div style="font-size:12px;color:var(--slate-500)">Define Programme Outcomes for each course (BCA, BBA, B.Com etc.) as per NEP 2020 and NBA/NAAC requirements.</div>
-          <button class="btn-secondary" style="margin-top:12px;font-size:12px" onclick="alert('PO definition — coming in next build')">Manage POs</button>
+  <style>
+  .poco-tabs{display:flex;border-bottom:2px solid var(--slate-200);overflow-x:auto;flex-shrink:0}
+  .poco-tab{padding:9px 16px;font-size:12px;font-weight:500;cursor:pointer;color:var(--slate-500);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s;font-family:'DM Sans',sans-serif;flex-shrink:0}
+  .poco-tab:hover{color:var(--slate-800)}
+  .poco-tab.active{color:var(--amber-dark);border-bottom-color:var(--amber);font-weight:600}
+
+  /* PO / CO pill */
+  .po-pill{display:inline-flex;align-items:center;justify-content:center;width:32px;height:22px;border-radius:4px;font-size:9px;font-weight:800;cursor:pointer;transition:all .15s;border:1px solid transparent;flex-shrink:0}
+  .po-pill.level-0{background:var(--slate-100);color:var(--slate-400);border-color:var(--slate-200)}
+  .po-pill.level-1{background:#dbeafe;color:#1e40af;border-color:#93c5fd}
+  .po-pill.level-2{background:#ede9fe;color:#5b21b6;border-color:#c4b5fd}
+  .po-pill.level-3{background:#d1fae5;color:#065f46;border-color:#6ee7b7}
+
+  /* Bloom badge */
+  .bloom-badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;white-space:nowrap}
+
+  /* Unit card */
+  .unit-card{background:#fff;border:1px solid var(--slate-200);border-radius:var(--r-lg);margin-bottom:10px;overflow:hidden;transition:border-color .15s}
+  .unit-card:hover{border-color:var(--amber)}
+  .unit-header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--slate-50);cursor:pointer;user-select:none}
+  .unit-num{width:32px;height:32px;border-radius:var(--r-md);background:var(--slate-800);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;flex-shrink:0}
+  .unit-body{padding:0 16px 14px}
+
+  /* Topic row */
+  .topic-row{display:grid;grid-template-columns:28px 1fr 70px 90px 90px 60px 100px 90px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--slate-100);font-size:11px}
+  .topic-row:last-child{border-bottom:none}
+  .topic-row.header{font-size:10px;font-weight:700;color:var(--slate-400);text-transform:uppercase;letter-spacing:.04em;padding:8px 0 4px;border-bottom:2px solid var(--slate-200)}
+  .topic-num{font-family:'Syne',sans-serif;font-size:10px;font-weight:800;color:var(--slate-400);text-align:center}
+  .topic-name-input{font-size:11px;padding:4px 7px;border:1px solid var(--slate-200);border-radius:4px;font-family:'DM Sans',sans-serif;width:100%;transition:border .15s;background:#fff}
+  .topic-name-input:focus{border-color:var(--amber);outline:none}
+  .topic-sel{font-size:10px;padding:3px 5px;border:1px solid var(--slate-200);border-radius:4px;font-family:'DM Sans',sans-serif;width:100%;background:#fff;cursor:pointer}
+  .topic-sel:focus{border-color:var(--amber);outline:none}
+
+  /* Matrix */
+  .matrix-wrap{overflow-x:auto}
+  .matrix-table{border-collapse:collapse;font-size:11px;min-width:600px}
+  .matrix-table th{background:var(--slate-800);color:#fff;padding:7px 10px;text-align:center;font-size:10px;font-weight:600;white-space:nowrap;letter-spacing:.03em}
+  .matrix-table th.row-header{text-align:left;min-width:140px}
+  .matrix-table td{border:1px solid var(--slate-200);padding:5px 8px;text-align:center;vertical-align:middle}
+  .matrix-table td.co-label{text-align:left;font-weight:600;background:var(--slate-50);color:var(--slate-700)}
+  .matrix-level{width:28px;height:22px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s}
+  .matrix-level.l0{background:var(--slate-100);color:var(--slate-400)}
+  .matrix-level.l1{background:#dbeafe;color:#1e40af}
+  .matrix-level.l2{background:#ede9fe;color:#5b21b6}
+  .matrix-level.l3{background:#d1fae5;color:#065f46}
+
+  /* AI upload zone */
+  .ai-drop-zone{border:2px dashed var(--slate-200);border-radius:var(--r-lg);padding:28px;text-align:center;cursor:pointer;transition:all .2s}
+  .ai-drop-zone:hover,.ai-drop-zone.drag-over{border-color:var(--amber);background:#fffbeb}
+
+  /* Stat strip */
+  .poco-stat{display:grid;grid-template-columns:repeat(5,1fr);background:#fff;border:1px solid var(--slate-200);border-radius:var(--r-lg);overflow:hidden;margin-bottom:14px}
+  .poco-stat-cell{padding:10px 14px;border-right:1px solid var(--slate-100)}
+  .poco-stat-cell:last-child{border-right:none}
+  .poco-stat-val{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;line-height:1}
+  .poco-stat-lbl{font-size:10px;color:var(--slate-400);margin-top:2px}
+
+  /* Lesson plan calendar strip */
+  .lp-date-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border-bottom:1px solid var(--slate-100);font-size:11px;transition:background .1s}
+  .lp-date-row:hover{background:#fffbeb}
+  .lp-date-badge{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;color:var(--slate-500);min-width:68px;flex-shrink:0}
+  .lp-co-tag{font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;background:#ede9fe;color:#5b21b6;flex-shrink:0}
+  .lp-bloom-tag{font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;flex-shrink:0}
+  </style>
+
+  <div style="display:flex;flex-direction:column;height:calc(100vh - 90px);overflow:hidden">
+
+    <!-- Stat strip -->
+    <div style="padding:16px 24px 0;flex-shrink:0">
+      <div class="poco-stat">
+        <div class="poco-stat-cell"><div class="poco-stat-val" id="ps-subjects" style="color:var(--slate-900)">0</div><div class="poco-stat-lbl">Subjects mapped</div></div>
+        <div class="poco-stat-cell"><div class="poco-stat-val" id="ps-topics"   style="color:#5b21b6">0</div><div class="poco-stat-lbl">Topics planned</div></div>
+        <div class="poco-stat-cell"><div class="poco-stat-val" id="ps-cos"      style="color:var(--blue-dark)">0</div><div class="poco-stat-lbl">COs defined</div></div>
+        <div class="poco-stat-cell"><div class="poco-stat-val" id="ps-mapped"   style="color:var(--green-dark)">0%</div><div class="poco-stat-lbl">Topics CO-mapped</div></div>
+        <div class="poco-stat-cell"><div class="poco-stat-val" id="ps-classes"  style="color:var(--amber-dark)">0</div><div class="poco-stat-lbl">Classes planned</div></div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div style="padding:0 24px;flex-shrink:0">
+      <div class="poco-tabs">
+        <div class="poco-tab active" id="ptab-pos"    onclick="pocoTab('pos',this)">Programme Outcomes</div>
+        <div class="poco-tab"        id="ptab-cos"    onclick="pocoTab('cos',this)">Course Outcomes</div>
+        <div class="poco-tab"        id="ptab-manual" onclick="pocoTab('manual',this)">Lesson Plan — Manual</div>
+        <div class="poco-tab"        id="ptab-ai"     onclick="pocoTab('ai',this)">Lesson Plan — AI</div>
+        <div class="poco-tab"        id="ptab-matrix" onclick="pocoTab('matrix',this)">CO-PO Matrix</div>
+        <div class="poco-tab"        id="ptab-lp"     onclick="pocoTab('lp',this)">Date-wise Plan</div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div style="flex:1;overflow-y:auto;padding:16px 24px 24px">
+
+    <!-- ════ PROGRAMME OUTCOMES ════ -->
+    <div id="psubtab-pos">
+      <div style="display:grid;grid-template-columns:1fr 380px;gap:16px;align-items:flex-start">
+        <!-- PO list -->
+        <div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
+            <select class="form-select" id="poDept" onchange="renderPOs()" style="width:180px;font-size:12px;padding:7px 10px">
+              <option value="BCA">BCA — Computer Applications</option>
+              <option value="BBA">BBA — Management Studies</option>
+              <option value="BCOM">B.Com — Commerce</option>
+              <option value="BSC">B.Sc — Sciences</option>
+              <option value="BA">BA — Arts</option>
+            </select>
+            <button class="btn-secondary" style="font-size:12px;padding:6px 12px" onclick="loadDefaultPOs()">Load BU / NEP defaults</button>
+            <button class="btn-primary"   style="font-size:12px;padding:6px 12px;margin-left:auto" onclick="addPO()">+ Add PO</button>
+          </div>
+          <div id="poListEl"></div>
         </div>
-        <div class="card" style="padding:20px;border-left:4px solid #3b82f6">
-          <div style="font-size:11px;font-weight:700;color:var(--slate-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Course Outcomes</div>
-          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--slate-900);margin-bottom:4px">Define COs per subject</div>
-          <div style="font-size:12px;color:var(--slate-500)">Write Course Outcomes (COs) for each subject with Bloom's taxonomy verbs. Map to POs with correlation level (1/2/3).</div>
-          <button class="btn-secondary" style="margin-top:12px;font-size:12px" onclick="alert('CO definition — coming in next build')">Manage COs</button>
-        </div>
-        <div class="card" style="padding:20px;border-left:4px solid #10b981">
-          <div style="font-size:11px;font-weight:700;color:var(--slate-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">CO-PO Matrix</div>
-          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--slate-900);margin-bottom:4px">Attainment matrix</div>
-          <div style="font-size:12px;color:var(--slate-500)">Generate CO-PO mapping matrix. Calculate attainment levels from CIE+SEE marks. Export for NAAC/NBA documentation.</div>
-          <button class="btn-secondary" style="margin-top:12px;font-size:12px" onclick="alert('CO-PO matrix — coming in next build')">View Matrix</button>
+        <!-- PO form -->
+        <div class="form-card" style="padding:16px 18px">
+          <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--slate-900);margin-bottom:12px" id="poFormTitle">Add Programme Outcome</div>
+          <div class="form-group" style="margin-bottom:8px">
+            <label class="form-label">PO code <span>*</span></label>
+            <input class="form-input" id="poCode" type="text" placeholder="e.g. PO1" style="font-size:12px"/>
+          </div>
+          <div class="form-group" style="margin-bottom:8px">
+            <label class="form-label">PO statement <span>*</span></label>
+            <textarea class="form-input" id="poStatement" rows="3" style="font-size:11px;resize:vertical" placeholder="e.g. Apply knowledge of computing and mathematics to solve real-world problems."></textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:8px">
+            <label class="form-label">Category</label>
+            <select class="form-select" id="poCategory" style="font-size:12px">
+              <option value="knowledge">Knowledge & Understanding</option>
+              <option value="skills">Skills & Application</option>
+              <option value="values">Values & Ethics</option>
+              <option value="career">Career & Employability</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:12px">
+            <label class="form-label">Applicable to</label>
+            <select class="form-select" id="poDeptSel" style="font-size:12px">
+              <option value="BCA">BCA</option><option value="BBA">BBA</option>
+              <option value="BCOM">B.Com</option><option value="BSC">B.Sc</option><option value="BA">BA</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button class="btn-primary" onclick="savePO()">Save PO</button>
+            <button class="btn-secondary" onclick="resetPOForm()">Clear</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+
+    <!-- ════ COURSE OUTCOMES ════ -->
+    <div id="psubtab-cos" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 380px;gap:16px;align-items:flex-start">
+        <div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap">
+            <select class="form-select" id="coDept" onchange="populateCOSubjectFilter();renderCOs()" style="width:160px;font-size:12px;padding:7px 10px">
+              <option value="BCA">BCA</option><option value="BBA">BBA</option>
+              <option value="BCOM">B.Com</option><option value="BSC">B.Sc</option><option value="BA">BA</option>
+            </select>
+            <select class="form-select" id="coSubjFilter" onchange="renderCOs()" style="width:200px;font-size:12px;padding:7px 10px">
+              <option value="">All subjects</option>
+            </select>
+            <button class="btn-primary" style="font-size:12px;padding:6px 12px;margin-left:auto" onclick="addCO()">+ Add CO</button>
+          </div>
+          <div id="coListEl"></div>
+        </div>
+        <!-- CO form -->
+        <div class="form-card" style="padding:16px 18px">
+          <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--slate-900);margin-bottom:12px" id="coFormTitle">Add Course Outcome</div>
+          <div class="form-group" style="margin-bottom:8px">
+            <label class="form-label">Subject <span>*</span></label>
+            <select class="form-select" id="coSubjSel" style="font-size:12px"><option value="">Select…</option></select>
+          </div>
+          <div class="form-group" style="margin-bottom:8px">
+            <label class="form-label">CO code <span>*</span></label>
+            <input class="form-input" id="coCode" type="text" placeholder="e.g. CO1" style="font-size:12px" maxlength="8"/>
+          </div>
+          <div class="form-group" style="margin-bottom:8px">
+            <label class="form-label">CO statement <span>*</span></label>
+            <textarea class="form-input" id="coStatement" rows="3" style="font-size:11px;resize:vertical" placeholder="Use Bloom's verb — e.g. 'Demonstrate the ability to design and implement data structures for solving computational problems.'"></textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:8px">
+            <label class="form-label">Bloom's level</label>
+            <select class="form-select" id="coBloom" style="font-size:12px">
+              <option value="1">L1 — Remember</option>
+              <option value="2">L2 — Understand</option>
+              <option value="3">L3 — Apply</option>
+              <option value="4">L4 — Analyse</option>
+              <option value="5">L5 — Evaluate</option>
+              <option value="6">L6 — Create</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:12px">
+            <label class="form-label" style="margin-bottom:6px">PO correlation (click to cycle: 0 → 1 → 2 → 3)</label>
+            <div id="coPOCorrel" style="display:flex;flex-wrap:wrap;gap:5px"></div>
+            <div style="font-size:10px;color:var(--slate-400);margin-top:5px">0=No link · 1=Low · 2=Medium · 3=High</div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-primary" onclick="saveCO()">Save CO</button>
+            <button class="btn-secondary" onclick="resetCOForm()">Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ LESSON PLAN — MANUAL ════ -->
+    <div id="psubtab-manual" style="display:none">
+      <!-- Subject selector + config -->
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+        <select class="form-select" id="lpDept" onchange="populateLPSubjectFilter();renderLessonPlan()" style="width:160px;font-size:12px;padding:7px 10px">
+          <option value="BCA">BCA</option><option value="BBA">BBA</option>
+          <option value="BCOM">B.Com</option><option value="BSC">B.Sc</option><option value="BA">BA</option>
+        </select>
+        <select class="form-select" id="lpSubject" onchange="loadSubjectIntoLP()" style="width:220px;font-size:12px;padding:7px 10px">
+          <option value="">Select subject…</option>
+        </select>
+        <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--slate-500)">
+          <span>Start:</span>
+          <input type="date" id="lpStartDate" style="padding:5px 8px;border:1px solid var(--slate-200);border-radius:4px;font-size:12px;font-family:'DM Sans',sans-serif" onchange="renderLessonPlan()"/>
+          <span>End:</span>
+          <input type="date" id="lpEndDate" style="padding:5px 8px;border:1px solid var(--slate-200);border-radius:4px;font-size:12px;font-family:'DM Sans',sans-serif" onchange="renderLessonPlan()"/>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn-secondary" style="font-size:12px;padding:6px 12px" onclick="exportLessonPlan()">Export PDF/CSV</button>
+          <button class="btn-primary"   style="font-size:12px;padding:6px 12px" onclick="saveLessonPlan()">Save plan</button>
+        </div>
+      </div>
+
+      <!-- Subject hours summary -->
+      <div id="lpSubjectSummary" style="display:none;padding:10px 14px;background:#eff6ff;border:1px solid #93c5fd;border-radius:var(--r-md);margin-bottom:12px;font-size:11px;color:#1e40af">
+      </div>
+
+      <!-- Unit accordion -->
+      <div id="lpUnitsEl">
+        <div style="text-align:center;padding:32px;font-size:12px;color:var(--slate-400)">Select a subject to start building the lesson plan.</div>
+      </div>
+    </div>
+
+    <!-- ════ LESSON PLAN — AI ════ -->
+    <div id="psubtab-ai" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:flex-start">
+
+        <!-- Left: config + upload -->
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="form-card" style="padding:16px 18px">
+            <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--slate-900);margin-bottom:12px">AI Lesson Plan Generator</div>
+            <div class="form-group" style="margin-bottom:8px">
+              <label class="form-label">Subject</label>
+              <select class="form-select" id="aiLPSubject" style="font-size:12px" onchange="aiLPSubjectChanged()">
+                <option value="">Select subject…</option>
+              </select>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+              <div class="form-group">
+                <label class="form-label">Total hours</label>
+                <input class="form-input" id="aiLPHours" type="number" value="60" min="10" max="200" style="font-size:12px"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Number of units</label>
+                <input class="form-input" id="aiLPUnits" type="number" value="4" min="1" max="10" style="font-size:12px"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Start date</label>
+                <input class="form-input" id="aiLPStart" type="date" style="font-size:12px"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">End date</label>
+                <input class="form-input" id="aiLPEnd" type="date" style="font-size:12px"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Classes per week</label>
+                <input class="form-input" id="aiLPPerWeek" type="number" value="5" min="1" max="10" style="font-size:12px"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Strictness</label>
+                <select class="form-select" id="aiLPStrictness" style="font-size:12px">
+                  <option value="balanced" selected>Balanced</option>
+                  <option value="strict">Strict BU syllabus</option>
+                  <option value="enriched">Enriched (extra topics)</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:8px">
+              <label class="form-label">Unit distribution (hours per unit, comma-separated)</label>
+              <input class="form-input" id="aiLPUnitHours" type="text" placeholder="e.g. 15,20,20,5" style="font-size:12px"/>
+              <div style="font-size:10px;color:var(--slate-400);margin-top:3px">Leave blank to auto-distribute equally</div>
+            </div>
+          </div>
+
+          <!-- Syllabus upload -->
+          <div class="form-card" style="padding:16px 18px">
+            <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--slate-900);margin-bottom:10px">Upload syllabus</div>
+            <div class="ai-drop-zone" id="aiSyllabusZone"
+              onclick="document.getElementById('aiSyllabusFile').click()"
+              ondragover="event.preventDefault();this.classList.add('drag-over')"
+              ondragleave="this.classList.remove('drag-over')"
+              ondrop="event.preventDefault();this.classList.remove('drag-over');handleSyllabusFile(event.dataTransfer.files[0])">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" style="margin:0 auto 8px;display:block"><path d="M6 6h14l6 6v14H6V6z" stroke="#d1d5db" stroke-width="1.5" stroke-linejoin="round"/><path d="M20 6v6h6" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round"/><path d="M10 17h12M10 21h8" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <div id="aiSyllabusLabel" style="font-size:12px;font-weight:500;color:var(--slate-500)">Upload syllabus document</div>
+              <div style="font-size:10px;color:var(--slate-400);margin-top:3px">PDF · DOCX · TXT · Image of syllabus page</div>
+            </div>
+            <input type="file" id="aiSyllabusFile" accept=".pdf,.docx,.doc,.txt,.jpg,.jpeg,.png" style="display:none" onchange="handleSyllabusFile(this.files[0])"/>
+
+            <div style="margin:10px 0;display:flex;align-items:center;gap:8px">
+              <div style="flex:1;height:1px;background:var(--slate-200)"></div>
+              <span style="font-size:10px;color:var(--slate-400)">or paste syllabus text</span>
+              <div style="flex:1;height:1px;background:var(--slate-200)"></div>
+            </div>
+
+            <textarea class="form-input" id="aiSyllabusText" rows="6" style="font-size:11px;resize:vertical" placeholder="Paste syllabus content here…&#10;&#10;Example:&#10;Unit 1 (15 hrs): Introduction to Data Structures — Arrays, Linked Lists, Stacks, Queues&#10;Unit 2 (20 hrs): Trees and Graphs — Binary Trees, BST, AVL Trees, Graph traversal&#10;Unit 3 (20 hrs): Sorting and Searching — Bubble, Selection, Merge, Quick sort, Binary Search&#10;Unit 4 (5 hrs): Advanced Topics — Hashing, Heaps, External sorting"></textarea>
+
+            <button class="btn-primary" style="width:100%;margin-top:10px;font-size:12px" onclick="runAILessonPlan()">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="display:inline;margin-right:4px;vertical-align:middle"><path d="M6.5 1.5L8 5h3.5L8.5 7.5l1 4-3-1.8-3 1.8 1-4L1.5 5H5z" fill="white"/></svg>
+              Generate complete lesson plan with AI
+            </button>
+            <div id="aiLPStatus" style="display:none;margin-top:8px;font-size:12px;padding:10px 12px;border-radius:var(--r-md)"></div>
+          </div>
+        </div>
+
+        <!-- Right: AI result preview -->
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--slate-700);margin-bottom:10px">Generated plan</div>
+          <div id="aiLPResultEl" style="background:#fff;border:1px solid var(--slate-200);border-radius:var(--r-lg);padding:16px;min-height:300px">
+            <div style="font-size:12px;color:var(--slate-400);text-align:center;padding:32px 0">Upload your syllabus and click "Generate" — AI will create the complete unit-wise lesson plan with CO, PO and Bloom's mapping for each topic.</div>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <button class="btn-primary"   style="font-size:12px;padding:6px 14px;flex:1" id="aiLPApproveBtn" onclick="approveAILessonPlan()" style="display:none">✓ Approve &amp; load into Manual plan</button>
+            <button class="btn-secondary" style="font-size:12px;padding:6px 12px" id="aiLPExportBtn" onclick="exportAILessonPlan()">Export</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ CO-PO MATRIX ════ -->
+    <div id="psubtab-matrix" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
+        <select class="form-select" id="matrixDeptPoco" onchange="renderPOCOMatrix()" style="width:180px;font-size:12px;padding:7px 10px">
+          <option value="BCA">BCA</option><option value="BBA">BBA</option>
+          <option value="BCOM">B.Com</option><option value="BSC">B.Sc</option><option value="BA">BA</option>
+        </select>
+        <div style="font-size:11px;color:var(--slate-400)">Click any cell to cycle correlation: 0 → 1 → 2 → 3</div>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn-secondary" style="font-size:12px;padding:6px 12px" onclick="exportMatrix()">Export matrix</button>
+        </div>
+      </div>
+      <!-- Legend -->
+      <div style="display:flex;gap:10px;margin-bottom:10px;font-size:11px;flex-wrap:wrap">
+        <span style="font-weight:600;color:var(--slate-600)">Correlation level:</span>
+        <span class="matrix-level l0" style="width:auto;padding:1px 8px">0 — Nil</span>
+        <span class="matrix-level l1" style="width:auto;padding:1px 8px">1 — Low</span>
+        <span class="matrix-level l2" style="width:auto;padding:1px 8px">2 — Medium</span>
+        <span class="matrix-level l3" style="width:auto;padding:1px 8px">3 — High</span>
+        <span style="color:var(--slate-400)">· Avg ≥2.5 = strong linkage (highlighted)</span>
+      </div>
+      <div class="matrix-wrap">
+        <div id="pocoMatrixEl"><div style="font-size:12px;color:var(--slate-400);padding:20px">Define COs and POs first, then the matrix will appear here.</div></div>
+      </div>
+    </div>
+
+    <!-- ════ DATE-WISE LESSON PLAN ════ -->
+    <div id="psubtab-lp" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
+        <select class="form-select" id="lpViewDept" onchange="populateLPViewSubject();renderDatewisePlan()" style="width:160px;font-size:12px;padding:7px 10px">
+          <option value="BCA">BCA</option><option value="BBA">BBA</option>
+          <option value="BCOM">B.Com</option><option value="BSC">B.Sc</option><option value="BA">BA</option>
+        </select>
+        <select class="form-select" id="lpViewSubject" onchange="renderDatewisePlan()" style="width:220px;font-size:12px;padding:7px 10px">
+          <option value="">Select subject…</option>
+        </select>
+        <select class="form-select" id="lpViewFilter" onchange="renderDatewisePlan()" style="width:140px;font-size:12px;padding:7px 10px">
+          <option value="">All classes</option>
+          <option value="unit1">Unit 1 only</option>
+          <option value="unit2">Unit 2 only</option>
+          <option value="unit3">Unit 3 only</option>
+          <option value="unit4">Unit 4 only</option>
+        </select>
+        <button class="btn-secondary" style="font-size:12px;padding:6px 12px;margin-left:auto" onclick="printLessonPlan()">Print</button>
+      </div>
+      <div id="datewisePlanEl" style="border:1px solid var(--slate-200);border-radius:var(--r-lg);overflow:hidden;background:#fff">
+        <div style="font-size:12px;color:var(--slate-400);text-align:center;padding:24px">Select a subject with a saved lesson plan to view the date-wise schedule.</div>
+      </div>
+    </div>
+
+    </div><!-- /scroll -->
+  </div><!-- /flex col -->
+  </div><!-- /page-po-co-mapping -->
+
 
   <!-- ══ MENTORING ══ -->
   <div class="page" id="page-mentoring" style="display:none">
@@ -5346,7 +5708,7 @@ body{
 </div><!-- /main -->
 </div><!-- /app-layout -->
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 
 /* ══════════════════════════════
    MULTI-PROVIDER AI MANAGER
@@ -5742,6 +6104,7 @@ function navigate(page) {
   if (page === 'setup-timetable')   initTimetableModule();
   if (page === 'exam-corner')       initExamModule();
   if (page === 'valuation')         initValuationModule();
+  if (page === 'po-co-mapping')     initPOCOModule();
   if (page === 'setup-fees')        initFeeModule();
 }
 
@@ -5750,6 +6113,959 @@ function navigate(page) {
 
 
 
+
+/* ════════════════════════════
+   PO-CO MAPPING MODULE
+════════════════════════════ */
+
+/* ── Data stores ── */
+let programmeOutcomes = {};   /* { dept: [{id,code,statement,category}] } */
+let courseOutcomes    = {};   /* { subjId: [{id,code,statement,bloom,poCorrel:{PO1:0..3}}] } */
+let lessonPlans       = {};   /* { subjId: {units:[{id,title,hours,topics:[{id,topic,hours,co,po,bloom,date}]}], startDate, endDate} } */
+let nextPOId = 1, nextCOId = 1, nextLPUnitId = 1, nextLPTopicId = 1;
+let editingPOId = null, editingCOId = null;
+let aiLPResult = null;   /* holds last AI-generated lesson plan for approval */
+let syllabusFileRef = null;
+
+const BLOOM_LABELS  = {1:'Remember',2:'Understand',3:'Apply',4:'Analyse',5:'Evaluate',6:'Create'};
+const BLOOM_BG      = {1:'#dbeafe',2:'#ede9fe',3:'#d1fae5',4:'#fef3c7',5:'#fee2e2',6:'#fce7f3'};
+const BLOOM_FG      = {1:'#1e40af',2:'#5b21b6',3:'#065f46',4:'#92400e',5:'#991b1b',6:'#9d174d'};
+const CATEGORY_LABELS = {knowledge:'Knowledge',skills:'Skills',values:'Values',career:'Career'};
+
+/* Default POs per dept per BU / NEP 2020 */
+const DEFAULT_POS = {
+  BCA: [
+    {code:'PO1',statement:'Apply knowledge of computing, mathematics, and domain disciplines to solve complex problems.',category:'knowledge'},
+    {code:'PO2',statement:'Design and develop computational solutions considering public health, safety, cultural, social, and environmental factors.',category:'skills'},
+    {code:'PO3',statement:'Use techniques, skills, and modern IT tools necessary for computing practice.',category:'skills'},
+    {code:'PO4',statement:'Demonstrate project management, finance, and teamwork capabilities in multidisciplinary environments.',category:'career'},
+    {code:'PO5',statement:'Understand and apply professional ethics and responsibilities in IT practice.',category:'values'},
+    {code:'PO6',statement:'Communicate effectively and engage in lifelong learning to adapt to evolving technology.',category:'career'},
+    {code:'PSO1',statement:'Demonstrate proficiency in programming, database systems, and software development.',category:'skills'},
+    {code:'PSO2',statement:'Apply theoretical foundations of computer science to analyse and design computing systems.',category:'knowledge'},
+  ],
+  BBA: [
+    {code:'PO1',statement:'Apply management theories and principles to analyse business situations and develop strategic solutions.',category:'knowledge'},
+    {code:'PO2',statement:'Demonstrate entrepreneurial thinking and leadership in organisational settings.',category:'career'},
+    {code:'PO3',statement:'Apply ethical practices and corporate social responsibility in business decision-making.',category:'values'},
+    {code:'PO4',statement:'Communicate business ideas effectively in oral and written formats.',category:'skills'},
+    {code:'PO5',statement:'Integrate digital technologies and data analytics for business problem-solving.',category:'skills'},
+    {code:'PSO1',statement:'Demonstrate competency in functional areas of management — finance, marketing, HR and operations.',category:'knowledge'},
+  ],
+  BCOM: [
+    {code:'PO1',statement:'Apply principles of commerce, accounting, and economics to analyse financial scenarios.',category:'knowledge'},
+    {code:'PO2',statement:'Prepare and interpret financial statements, reports, and tax documents accurately.',category:'skills'},
+    {code:'PO3',statement:'Demonstrate ethical behaviour and legal compliance in commercial and financial activities.',category:'values'},
+    {code:'PO4',statement:'Use accounting software and digital tools in financial practice.',category:'skills'},
+    {code:'PSO1',statement:'Demonstrate expertise in taxation, auditing, and corporate financial management.',category:'knowledge'},
+  ],
+  BSC: [
+    {code:'PO1',statement:'Apply scientific knowledge and analytical skills to investigate and solve problems in natural sciences.',category:'knowledge'},
+    {code:'PO2',statement:'Design and conduct experiments with proper data analysis and interpretation.',category:'skills'},
+    {code:'PO3',statement:'Demonstrate professional ethics and responsibilities in scientific practice.',category:'values'},
+    {code:'PO4',statement:'Communicate scientific findings clearly and engage in lifelong learning.',category:'career'},
+    {code:'PSO1',statement:'Demonstrate integrated knowledge of physics, chemistry, mathematics and their interdisciplinary applications.',category:'knowledge'},
+  ],
+  BA: [
+    {code:'PO1',statement:'Apply critical thinking, research skills, and analytical reasoning to humanities and social science problems.',category:'knowledge'},
+    {code:'PO2',statement:'Communicate complex ideas effectively through diverse written and oral formats.',category:'skills'},
+    {code:'PO3',statement:'Demonstrate civic responsibility, cultural sensitivity, and ethical awareness.',category:'values'},
+    {code:'PO4',statement:'Engage in interdisciplinary learning and contribute meaningfully to society.',category:'career'},
+    {code:'PSO1',statement:'Demonstrate domain expertise in chosen streams with application to real-world socio-cultural contexts.',category:'knowledge'},
+  ],
+};
+
+/* ── Tab switch ── */
+function pocoTab(tab, btn) {
+  ['pos','cos','manual','ai','matrix','lp'].forEach(t => {
+    const el = document.getElementById('psubtab-' + t);
+    const b  = document.getElementById('ptab-' + t);
+    if (el) el.style.display = 'none';
+    if (b)  b.classList.remove('active');
+  });
+  const target = document.getElementById('psubtab-' + tab);
+  if (target) target.style.display = '';
+  if (btn) btn.classList.add('active');
+
+  if (tab === 'pos')    { renderPOs(); }
+  if (tab === 'cos')    { populateCOSubjectFilter(); renderCOs(); renderCOPOCorrelPills(); }
+  if (tab === 'manual') { populateLPSubjectFilter(); }
+  if (tab === 'ai')     { populateAILPSubjectFilter(); }
+  if (tab === 'matrix') { renderPOCOMatrix(); }
+  if (tab === 'lp')     { populateLPViewSubject(); renderDatewisePlan(); }
+}
+
+/* ── Stats ── */
+function updatePOCOStats() {
+  const allCOs   = Object.values(courseOutcomes).flat();
+  const allPlans = Object.values(lessonPlans);
+  const topics   = allPlans.flatMap(p => p.units?.flatMap(u => u.topics)||[]);
+  const mapped   = topics.filter(t => t.co).length;
+  const pct      = topics.length ? Math.round(mapped/topics.length*100) : 0;
+  const totalClasses = topics.reduce((a,t)=>a+(t.hours||1),0);
+  const mappedSubjs  = Object.keys(lessonPlans).length;
+
+  const s = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  s('ps-subjects', mappedSubjs);
+  s('ps-topics',   topics.length);
+  s('ps-cos',      allCOs.length);
+  s('ps-mapped',   pct + '%');
+  s('ps-classes',  totalClasses);
+}
+
+/* ════ PROGRAMME OUTCOMES ════ */
+function loadDefaultPOs() {
+  const dept = document.getElementById('poDept')?.value || 'BCA';
+  if ((programmeOutcomes[dept]||[]).length && !confirm('Load default POs for ' + dept + '? Existing POs kept.')) return;
+  if (!programmeOutcomes[dept]) programmeOutcomes[dept] = [];
+  DEFAULT_POS[dept]?.forEach(po => {
+    if (!programmeOutcomes[dept].find(x => x.code === po.code)) {
+      programmeOutcomes[dept].push({ id: nextPOId++, dept, ...po });
+    }
+  });
+  renderPOs();
+  renderCOPOCorrelPills();
+}
+
+function renderPOs() {
+  const el   = document.getElementById('poListEl');
+  const dept = document.getElementById('poDept')?.value || 'BCA';
+  if (!el) return;
+  const list = programmeOutcomes[dept] || [];
+  if (!list.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--slate-400);padding:12px 0">No POs defined. Click "Load BU / NEP defaults" or add manually.</div>';
+    return;
+  }
+  const catColors = {knowledge:'#dbeafe',skills:'#d1fae5',values:'#fef3c7',career:'#ede9fe'};
+  const catText   = {knowledge:'#1e40af',skills:'#065f46',values:'#92400e',career:'#5b21b6'};
+  el.innerHTML = list.map(po => `
+    <div style="background:#fff;border:1px solid var(--slate-200);border-radius:var(--r-md);padding:11px 14px;margin-bottom:7px;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='var(--amber)'" onmouseout="this.style.borderColor='var(--slate-200)'" onclick="loadPO(${po.id})">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div style="display:flex;align-items:flex-start;gap:10px;flex:1">
+          <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:800;padding:3px 10px;border-radius:4px;background:var(--slate-900);color:#fff;flex-shrink:0;margin-top:1px">${po.code}</div>
+          <div style="font-size:12px;color:var(--slate-700);line-height:1.5">${po.statement}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0">
+          <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:${catColors[po.category]||'#f3f4f6'};color:${catText[po.category]||'#374151'}">${CATEGORY_LABELS[po.category]||po.category}</span>
+          <button onclick="event.stopPropagation();deletePO(${po.id})" style="font-size:10px;color:var(--slate-300);background:none;border:none;cursor:pointer">×</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function savePO() {
+  const dept      = document.getElementById('poDeptSel')?.value || 'BCA';
+  const code      = document.getElementById('poCode')?.value.trim();
+  const statement = document.getElementById('poStatement')?.value.trim();
+  if (!code || !statement) { alert('PO code and statement are required.'); return; }
+  if (!programmeOutcomes[dept]) programmeOutcomes[dept] = [];
+  const po = { id: editingPOId||nextPOId++, dept, code, statement, category: document.getElementById('poCategory')?.value||'knowledge' };
+  if (editingPOId !== null) {
+    const idx = programmeOutcomes[dept].findIndex(x=>x.id===editingPOId);
+    if (idx>=0) programmeOutcomes[dept][idx]=po;
+  } else {
+    programmeOutcomes[dept].push(po);
+  }
+  resetPOForm();
+  renderPOs();
+  renderCOPOCorrelPills();
+}
+
+function loadPO(id) {
+  const dept = Object.keys(programmeOutcomes).find(d => programmeOutcomes[d].find(p=>p.id===id));
+  if (!dept) return;
+  const po = programmeOutcomes[dept].find(p=>p.id===id);
+  editingPOId = id;
+  document.getElementById('poCode').value      = po.code;
+  document.getElementById('poStatement').value  = po.statement;
+  document.getElementById('poCategory').value   = po.category;
+  document.getElementById('poDeptSel').value    = po.dept;
+  document.getElementById('poFormTitle').textContent = 'Edit: '+po.code;
+}
+
+function deletePO(id) {
+  if (!confirm('Delete this PO?')) return;
+  Object.keys(programmeOutcomes).forEach(d => { programmeOutcomes[d] = programmeOutcomes[d].filter(p=>p.id!==id); });
+  renderPOs();
+}
+
+function resetPOForm() {
+  editingPOId = null;
+  ['poCode','poStatement'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('poFormTitle').textContent='Add Programme Outcome';
+}
+
+function addPO() { resetPOForm(); }
+
+/* ════ COURSE OUTCOMES ════ */
+function populateCOSubjectFilter() {
+  const dept = document.getElementById('coDept')?.value || 'BCA';
+  [document.getElementById('coSubjFilter'), document.getElementById('coSubjSel')].forEach(sel => {
+    if (!sel) return;
+    const cur = sel.value;
+    const prefix = sel.id === 'coSubjFilter' ? '<option value="">All subjects</option>' : '<option value="">Select…</option>';
+    sel.innerHTML = prefix + subjects.filter(s=>s.dept===dept).map(s=>`<option value="${s.id}">${s.code} — ${s.name}</option>`).join('');
+    if (cur) sel.value = cur;
+  });
+}
+
+function renderCOs() {
+  const el     = document.getElementById('coListEl');
+  const dept   = document.getElementById('coDept')?.value  || 'BCA';
+  const subjId = parseInt(document.getElementById('coSubjFilter')?.value)||null;
+  if (!el) return;
+  const deptSubjs = subjects.filter(s=>s.dept===dept);
+  const allCOs = deptSubjs.flatMap(s => (courseOutcomes[s.id]||[]).map(co=>({...co,subj:s}))).filter(co=>!subjId||co.subjId===subjId||co.subj?.id===subjId);
+  if (!allCOs.length) {
+    el.innerHTML='<div style="font-size:12px;color:var(--slate-400);padding:12px 0">No COs defined yet. Add a CO or use the AI Lesson Plan tab to auto-generate them.</div>';
+    return;
+  }
+  const poList = programmeOutcomes[dept]||[];
+  el.innerHTML = allCOs.map(co=>{
+    const bBg=BLOOM_BG[co.bloom]||'#f3f4f6', bFg=BLOOM_FG[co.bloom]||'#374151';
+    const correlPills = poList.map(po=>{
+      const lv=co.poCorrel?.[po.code]||0;
+      const cls=['level-0','level-1','level-2','level-3'][lv];
+      return `<span class="po-pill ${cls}" title="${po.code}: level ${lv}">${po.code}</span>`;
+    }).join('');
+    return `<div style="background:#fff;border:1px solid var(--slate-200);border-radius:var(--r-md);padding:11px 14px;margin-bottom:7px;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='var(--amber)'" onmouseout="this.style.borderColor='var(--slate-200)'" onclick="loadCO(${co.id},${co.subj?.id})">
+      <div style="display:flex;align-items:flex-start;gap:8px;justify-content:space-between">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap">
+            <span style="font-family:'Syne',sans-serif;font-size:11px;font-weight:800;padding:2px 8px;border-radius:4px;background:#5b21b6;color:#fff">${co.code}</span>
+            <span style="font-size:10px;color:var(--slate-400)">${co.subj?.code||''}</span>
+            <span class="bloom-badge" style="background:${bBg};color:${bFg}">L${co.bloom} ${BLOOM_LABELS[co.bloom]||''}</span>
+          </div>
+          <div style="font-size:12px;color:var(--slate-700);line-height:1.5;margin-bottom:5px">${co.statement}</div>
+          <div style="display:flex;gap:3px;flex-wrap:wrap">${correlPills||'<span style="font-size:10px;color:var(--slate-300)">No PO mapping yet</span>'}</div>
+        </div>
+        <button onclick="event.stopPropagation();deleteCO(${co.id},${co.subj?.id})" style="font-size:12px;color:var(--slate-300);background:none;border:none;cursor:pointer;flex-shrink:0">×</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderCOPOCorrelPills() {
+  const el    = document.getElementById('coPOCorrel');
+  const dept  = document.getElementById('coDept')?.value || document.getElementById('poDept')?.value || 'BCA';
+  if (!el) return;
+  const poList= programmeOutcomes[dept]||[];
+  if (!poList.length) { el.innerHTML='<span style="font-size:11px;color:var(--slate-400)">Define POs first</span>'; return; }
+  /* Read current CO being edited */
+  const coId  = editingCOId;
+  const subjId= parseInt(document.getElementById('coSubjSel')?.value)||null;
+  const curCO = subjId&&coId ? (courseOutcomes[subjId]||[]).find(c=>c.id===coId) : null;
+  el.innerHTML = poList.map(po=>{
+    const lv = curCO?.poCorrel?.[po.code]||0;
+    return `<button class="po-pill level-${lv}" id="correl_${po.code}" onclick="cycleCorrel('${po.code}',this)" title="Click to cycle correlation level">${po.code}<sup style="font-size:7px">${lv}</sup></button>`;
+  }).join('');
+}
+
+function cycleCorrel(poCode, btn) {
+  const cur = parseInt(btn.className.match(/level-(\d)/)?.[1])||0;
+  const next = (cur + 1) % 4;
+  btn.className = `po-pill level-${next}`;
+  btn.innerHTML = `${poCode}<sup style="font-size:7px">${next}</sup>`;
+}
+
+function getCorrelValues() {
+  const vals = {};
+  document.querySelectorAll('#coPOCorrel .po-pill').forEach(btn => {
+    const code = btn.id.replace('correl_','');
+    vals[code] = parseInt(btn.className.match(/level-(\d)/)?.[1])||0;
+  });
+  return vals;
+}
+
+function saveCO() {
+  const subjId    = parseInt(document.getElementById('coSubjSel')?.value);
+  const code      = document.getElementById('coCode')?.value.trim();
+  const statement = document.getElementById('coStatement')?.value.trim();
+  if (!subjId||!code||!statement) { alert('Subject, CO code and statement are required.'); return; }
+  if (!courseOutcomes[subjId]) courseOutcomes[subjId] = [];
+  const co = {
+    id: editingCOId||nextCOId++, subjId, code, statement,
+    bloom: parseInt(document.getElementById('coBloom')?.value)||1,
+    poCorrel: getCorrelValues(),
+  };
+  if (editingCOId!==null) {
+    const idx=courseOutcomes[subjId].findIndex(x=>x.id===editingCOId);
+    if(idx>=0) courseOutcomes[subjId][idx]=co; else courseOutcomes[subjId].push(co);
+  } else {
+    courseOutcomes[subjId].push(co);
+  }
+  resetCOForm();
+  renderCOs();
+  updatePOCOStats();
+}
+
+function loadCO(coId, subjId) {
+  if (!subjId) return;
+  const co = (courseOutcomes[subjId]||[]).find(c=>c.id===coId);
+  if (!co) return;
+  editingCOId=coId;
+  document.getElementById('coSubjSel').value  = subjId;
+  document.getElementById('coCode').value     = co.code;
+  document.getElementById('coStatement').value= co.statement;
+  document.getElementById('coBloom').value    = co.bloom||1;
+  document.getElementById('coFormTitle').textContent='Edit: '+co.code;
+  renderCOPOCorrelPills();
+  /* Set correlation pills */
+  setTimeout(()=>{
+    document.querySelectorAll('#coPOCorrel .po-pill').forEach(btn=>{
+      const code=btn.id.replace('correl_','');
+      const lv=co.poCorrel?.[code]||0;
+      btn.className=`po-pill level-${lv}`;
+      btn.innerHTML=`${code}<sup style="font-size:7px">${lv}</sup>`;
+    });
+  },50);
+}
+
+function deleteCO(coId,subjId) {
+  if(!confirm('Delete this CO?'))return;
+  if(courseOutcomes[subjId]) courseOutcomes[subjId]=courseOutcomes[subjId].filter(c=>c.id!==coId);
+  renderCOs(); updatePOCOStats();
+}
+
+function resetCOForm() {
+  editingCOId=null;
+  ['coCode','coStatement'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('coSubjSel').value='';
+  document.getElementById('coBloom').value='1';
+  document.getElementById('coFormTitle').textContent='Add Course Outcome';
+  renderCOPOCorrelPills();
+}
+function addCO() { resetCOForm(); populateCOSubjectFilter(); }
+
+/* ════ LESSON PLAN — MANUAL ════ */
+function populateLPSubjectFilter() {
+  const dept=document.getElementById('lpDept')?.value||'BCA';
+  const sel=document.getElementById('lpSubject');
+  if(!sel)return;
+  sel.innerHTML='<option value="">Select subject…</option>'+
+    subjects.filter(s=>s.dept===dept).map(s=>`<option value="${s.id}">${s.code} — ${s.name} (${s.hours||60}h)</option>`).join('');
+}
+
+function loadSubjectIntoLP() {
+  const subjId=parseInt(document.getElementById('lpSubject')?.value)||null;
+  if(!subjId)return;
+  const subj=subjects.find(s=>s.id===subjId);
+  if(!subj)return;
+  /* Set default dates from BU calendar if known */
+  const startEl=document.getElementById('lpStartDate');
+  const endEl  =document.getElementById('lpEndDate');
+  if(startEl&&!startEl.value) startEl.value='2025-06-16';
+  if(endEl  &&!endEl.value)   endEl.value  ='2025-11-15';
+  /* Show summary bar */
+  const summary=document.getElementById('lpSubjectSummary');
+  if(summary){
+    summary.style.display='';
+    summary.innerHTML=`<strong>${subj.name}</strong> · <strong>${subj.hours||60}</strong> total hours · ${subj.type==='lab'?'Lab':'Theory'} · ${subj.credits||4} credits · Sem ${subj.sem||'—'}`;
+  }
+  /* Load existing or create fresh plan */
+  if(!lessonPlans[subjId]) initFreshPlan(subjId, subj);
+  renderLessonPlan();
+}
+
+function initFreshPlan(subjId, subj) {
+  const totalHrs=subj.hours||60;
+  /* Default 4-unit split: 25%, 33%, 33%, 9% */
+  const unitHrs=[Math.ceil(totalHrs*.25), Math.ceil(totalHrs*.33), Math.ceil(totalHrs*.33), totalHrs-Math.ceil(totalHrs*.25)-Math.ceil(totalHrs*.33)-Math.ceil(totalHrs*.33)];
+  lessonPlans[subjId]={
+    subjId, startDate:'2025-06-16', endDate:'2025-11-15',
+    units: unitHrs.map((hrs,i)=>({
+      id:nextLPUnitId++, title:`Unit ${i+1}`, hours:hrs,
+      topics: Array.from({length:Math.max(1,Math.ceil(hrs/2))},(_,j)=>({
+        id:nextLPTopicId++, topic:'', hours:1,
+        co:'', po:'', bloom:String(Math.min(i+1,3)), date:'',
+      })),
+    })),
+  };
+}
+
+function renderLessonPlan() {
+  const el=document.getElementById('lpUnitsEl');
+  const subjId=parseInt(document.getElementById('lpSubject')?.value)||null;
+  if(!el)return;
+  if(!subjId){el.innerHTML='<div style="text-align:center;padding:32px;font-size:12px;color:var(--slate-400)">Select a subject.</div>';return;}
+  const plan=lessonPlans[subjId];
+  if(!plan){el.innerHTML='<div style="text-align:center;padding:32px;font-size:12px;color:var(--slate-400)">Select subject first.</div>';return;}
+
+  const subjCOs=(courseOutcomes[subjId]||[]);
+  const dept=document.getElementById('lpDept')?.value||'BCA';
+  const deptPOs=(programmeOutcomes[dept]||[]);
+
+  el.innerHTML = plan.units.map((unit,ui)=>{
+    const usedHrs=unit.topics.reduce((a,t)=>a+(t.hours||1),0);
+    const pct=Math.min(100,Math.round(usedHrs/unit.hours*100));
+    const barColor=pct>100?'var(--red)':pct===100?'var(--green)':'var(--amber)';
+
+    const topicRows=unit.topics.map((t,ti)=>`
+      <div class="topic-row">
+        <div class="topic-num">${ti+1}</div>
+        <input class="topic-name-input" value="${t.topic||''}" placeholder="Topic name…"
+          onchange="updateTopic(${subjId},${unit.id},${t.id},'topic',this.value)"/>
+        <input class="form-input" type="number" min="0.5" max="10" step="0.5" value="${t.hours||1}"
+          style="font-size:11px;padding:4px 6px;text-align:center"
+          onchange="updateTopic(${subjId},${unit.id},${t.id},'hours',parseFloat(this.value)||1);rerenderUnitBar(${subjId},${unit.id})"/>
+        <select class="topic-sel" onchange="updateTopic(${subjId},${unit.id},${t.id},'co',this.value)">
+          <option value="">— CO —</option>
+          ${subjCOs.map(co=>`<option value="${co.code}" ${t.co===co.code?'selected':''}>${co.code}</option>`).join('')}
+        </select>
+        <select class="topic-sel" onchange="updateTopic(${subjId},${unit.id},${t.id},'po',this.value)">
+          <option value="">— PO —</option>
+          ${deptPOs.map(po=>`<option value="${po.code}" ${t.po===po.code?'selected':''}>${po.code}</option>`).join('')}
+        </select>
+        <select class="topic-sel" onchange="updateTopic(${subjId},${unit.id},${t.id},'bloom',this.value)">
+          ${[1,2,3,4,5,6].map(l=>`<option value="${l}" ${t.bloom==l?'selected':''}>L${l}</option>`).join('')}
+        </select>
+        <input class="form-input" type="date" value="${t.date||''}" style="font-size:10px;padding:3px 5px"
+          onchange="updateTopic(${subjId},${unit.id},${t.id},'date',this.value)"/>
+        <div style="display:flex;gap:3px">
+          <button onclick="deleteTopic(${subjId},${unit.id},${t.id})" style="font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;padding:0 2px">×</button>
+        </div>
+      </div>`).join('');
+
+    return `<div class="unit-card" id="unitcard_${unit.id}">
+      <div class="unit-header" onclick="toggleUnit('unitbody_${unit.id}')">
+        <div class="unit-num">${ui+1}</div>
+        <div style="flex:1">
+          <input class="topic-name-input" value="${unit.title}" placeholder="Unit title"
+            onclick="event.stopPropagation()"
+            style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;background:transparent;border-color:transparent;padding:0"
+            onchange="updateUnitTitle(${subjId},${unit.id},this.value)"/>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+            <div style="font-size:10px;color:var(--slate-400)">
+              <input type="number" value="${unit.hours}" min="1" max="200" step="1"
+                style="width:40px;padding:1px 4px;border:1px solid var(--slate-200);border-radius:3px;font-size:10px;text-align:center"
+                onclick="event.stopPropagation()"
+                onchange="updateUnitHours(${subjId},${unit.id},parseFloat(this.value)||1)"/> hrs planned ·
+              <span id="used_${unit.id}">${usedHrs}</span> hrs used
+            </div>
+            <div style="flex:1;max-width:120px;background:var(--slate-200);border-radius:3px;height:5px;overflow:hidden">
+              <div id="bar_${unit.id}" style="height:100%;border-radius:3px;background:${barColor};width:${pct}%;transition:width .3s"></div>
+            </div>
+            <span style="font-size:10px;font-weight:700;color:${barColor}" id="pct_${unit.id}">${pct}%</span>
+          </div>
+        </div>
+        <button onclick="event.stopPropagation();addTopic(${subjId},${unit.id})" style="font-size:11px;color:var(--amber-dark);background:var(--amber-light);border:1px solid #fcd34d;border-radius:4px;padding:3px 10px;cursor:pointer;flex-shrink:0">+ Topic</button>
+        <button onclick="event.stopPropagation();deleteUnit(${subjId},${unit.id})" style="font-size:11px;color:var(--slate-300);background:none;border:none;cursor:pointer">×</button>
+      </div>
+      <div class="unit-body" id="unitbody_${unit.id}" style="display:block">
+        <div class="topic-row header">
+          <div></div><div>Topic</div><div>Hrs</div><div>CO</div><div>PO</div><div>Bloom</div><div>Date</div><div></div>
+        </div>
+        ${topicRows}
+      </div>
+    </div>`;
+  }).join('') + `
+    <button class="btn-secondary" style="width:100%;font-size:12px;margin-top:6px" onclick="addUnit(${subjId})">+ Add unit</button>`;
+}
+
+function toggleUnit(id) {
+  const el=document.getElementById(id);
+  if(el) el.style.display=el.style.display==='none'?'block':'none';
+}
+
+function updateTopic(subjId,unitId,topicId,field,val) {
+  const plan=lessonPlans[subjId]; if(!plan)return;
+  const unit=plan.units.find(u=>u.id===unitId); if(!unit)return;
+  const t=unit.topics.find(t=>t.id===topicId); if(!t)return;
+  t[field]=val;
+  updatePOCOStats();
+}
+
+function updateUnitTitle(subjId,unitId,val) {
+  const unit=lessonPlans[subjId]?.units?.find(u=>u.id===unitId);
+  if(unit) unit.title=val;
+}
+
+function updateUnitHours(subjId,unitId,val) {
+  const unit=lessonPlans[subjId]?.units?.find(u=>u.id===unitId);
+  if(unit) { unit.hours=val; rerenderUnitBar(subjId,unitId); }
+}
+
+function rerenderUnitBar(subjId,unitId) {
+  const unit=lessonPlans[subjId]?.units?.find(u=>u.id===unitId); if(!unit)return;
+  const used=unit.topics.reduce((a,t)=>a+(t.hours||1),0);
+  const pct=Math.min(100,Math.round(used/unit.hours*100));
+  const color=pct>100?'var(--red)':pct===100?'var(--green)':'var(--amber)';
+  const usedEl=document.getElementById('used_'+unitId);
+  const barEl =document.getElementById('bar_'+unitId);
+  const pctEl =document.getElementById('pct_'+unitId);
+  if(usedEl) usedEl.textContent=used;
+  if(barEl)  { barEl.style.width=pct+'%'; barEl.style.background=color; }
+  if(pctEl)  { pctEl.textContent=pct+'%'; pctEl.style.color=color; }
+}
+
+function addTopic(subjId,unitId) {
+  const unit=lessonPlans[subjId]?.units?.find(u=>u.id===unitId); if(!unit)return;
+  unit.topics.push({id:nextLPTopicId++,topic:'',hours:1,co:'',po:'',bloom:'1',date:''});
+  renderLessonPlan();
+}
+
+function deleteTopic(subjId,unitId,topicId) {
+  const unit=lessonPlans[subjId]?.units?.find(u=>u.id===unitId); if(!unit)return;
+  unit.topics=unit.topics.filter(t=>t.id!==topicId);
+  renderLessonPlan(); updatePOCOStats();
+}
+
+function addUnit(subjId) {
+  if(!lessonPlans[subjId])return;
+  lessonPlans[subjId].units.push({id:nextLPUnitId++,title:'Unit '+(lessonPlans[subjId].units.length+1),hours:10,topics:[{id:nextLPTopicId++,topic:'',hours:1,co:'',po:'',bloom:'1',date:''}]});
+  renderLessonPlan();
+}
+
+function deleteUnit(subjId,unitId) {
+  if(!confirm('Delete this unit and all its topics?'))return;
+  lessonPlans[subjId].units=lessonPlans[subjId].units.filter(u=>u.id!==unitId);
+  renderLessonPlan(); updatePOCOStats();
+}
+
+function saveLessonPlan() {
+  const subjId=parseInt(document.getElementById('lpSubject')?.value)||null;
+  if(!subjId){alert('Select a subject first.');return;}
+  if(lessonPlans[subjId]){
+    lessonPlans[subjId].startDate=document.getElementById('lpStartDate')?.value||'';
+    lessonPlans[subjId].endDate  =document.getElementById('lpEndDate')?.value||'';
+  }
+  updatePOCOStats();
+  alert('Lesson plan saved successfully.');
+}
+
+function exportLessonPlan() {
+  const subjId=parseInt(document.getElementById('lpSubject')?.value)||null;
+  const plan=lessonPlans[subjId];
+  if(!plan){alert('Save the lesson plan first.');return;}
+  const subj=subjects.find(s=>s.id===subjId);
+  const rows=[['Unit','Unit Title','Unit Hours','#','Topic','Topic Hours','CO','PO','Bloom Level','Date']];
+  plan.units.forEach((u,ui)=>{
+    u.topics.forEach((t,ti)=>{
+      rows.push([`Unit ${ui+1}`,u.title,u.hours,ti+1,t.topic||'',t.hours,t.co||'',t.po||`L${t.bloom} ${BLOOM_LABELS[t.bloom]||''}`,t.date||'']);
+    });
+  });
+  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([csv],{type:'text/csv'})),download:`lesson_plan_${subj?.code||'subject'}.csv`});
+  a.click();
+}
+
+/* ════ AI LESSON PLAN ════ */
+function populateAILPSubjectFilter() {
+  const sel=document.getElementById('aiLPSubject');
+  if(!sel)return;
+  sel.innerHTML='<option value="">Select subject…</option>'+subjects.map(s=>`<option value="${s.id}">${s.code} — ${s.name} (${s.dept})</option>`).join('');
+}
+
+function aiLPSubjectChanged() {
+  const subjId=parseInt(document.getElementById('aiLPSubject')?.value)||null;
+  const subj=subjects.find(s=>s.id===subjId);
+  if(!subj)return;
+  document.getElementById('aiLPHours').value  = subj.hours||60;
+  document.getElementById('aiLPStart').value  = '2025-06-16';
+  document.getElementById('aiLPEnd').value    = '2025-11-15';
+}
+
+function handleSyllabusFile(file) {
+  if(!file)return;
+  syllabusFileRef=file;
+  document.getElementById('aiSyllabusLabel').textContent='📎 '+file.name+' — ready';
+}
+
+async function runAILessonPlan() {
+  const subjId   =parseInt(document.getElementById('aiLPSubject')?.value)||null;
+  const totalHrs =parseInt(document.getElementById('aiLPHours')?.value)||60;
+  const numUnits =parseInt(document.getElementById('aiLPUnits')?.value)||4;
+  const startDate=document.getElementById('aiLPStart')?.value||'2025-06-16';
+  const endDate  =document.getElementById('aiLPEnd')?.value  ||'2025-11-15';
+  const perWeek  =parseInt(document.getElementById('aiLPPerWeek')?.value)||5;
+  const strictness=document.getElementById('aiLPStrictness')?.value||'balanced';
+  const unitHrsRaw=document.getElementById('aiLPUnitHours')?.value.trim();
+  const syllabusText=document.getElementById('aiSyllabusText')?.value.trim();
+  const file=syllabusFileRef;
+  const subj=subjects.find(s=>s.id===subjId);
+
+  const statusEl=document.getElementById('aiLPStatus');
+  const resultEl=document.getElementById('aiLPResultEl');
+
+  function setStatus(msg,type){
+    if(!statusEl)return;
+    statusEl.style.display='block';
+    const bg={info:'#eff6ff',ok:'#d1fae5',warn:'#fef3c7',err:'#fee2e2'};
+    const fg={info:'#1e40af',ok:'#065f46',warn:'#92400e',err:'#991b1b'};
+    statusEl.style.background=bg[type]||bg.info; statusEl.style.color=fg[type]||fg.info;
+    statusEl.innerHTML=msg;
+  }
+
+  if(!subjId){setStatus('Please select a subject.','warn');return;}
+  if(!syllabusText&&!file){setStatus('Upload a syllabus or paste the syllabus text.','warn');return;}
+  if(resultEl) resultEl.innerHTML='<div style="text-align:center;padding:24px;font-size:12px;color:var(--slate-400)">Generating…</div>';
+  setStatus('AI is reading the syllabus and generating lesson plan with CO-PO-Bloom mapping…','info');
+
+  /* Unit hour distribution */
+  let unitHrs=[];
+  if(unitHrsRaw){
+    unitHrs=unitHrsRaw.split(',').map(x=>parseInt(x.trim())).filter(x=>!isNaN(x));
+  }
+  if(!unitHrs.length){
+    const base=Math.floor(totalHrs/numUnits);
+    const rem=totalHrs-base*numUnits;
+    unitHrs=Array.from({length:numUnits},(_,i)=>base+(i===numUnits-1?rem:0));
+  }
+
+  /* Dept POs for AI to map to */
+  const dept=subj?.dept||'BCA';
+  const deptPOs=(programmeOutcomes[dept]||[]);
+  const poList=deptPOs.map(po=>`${po.code}: ${po.statement}`).join('\n')||'PO1–PO6 (standard BU programme outcomes)';
+
+  const SYSTEM=`You are an expert curriculum designer for Bangalore University affiliated colleges in India, designing lesson plans as per NEP 2020 and NAAC standards.
+
+Return ONLY valid raw JSON — no markdown, no explanation:
+{
+  "subject": "<subject name>",
+  "totalHours": <number>,
+  "startDate": "<YYYY-MM-DD>",
+  "endDate": "<YYYY-MM-DD>",
+  "units": [
+    {
+      "unitNo": 1,
+      "title": "<Unit title>",
+      "hours": <number>,
+      "topics": [
+        {
+          "topicNo": 1,
+          "topic": "<topic name>",
+          "hours": <number, 1 or 2>,
+          "co": "<CO code, e.g. CO1>",
+          "po": "<PO code, e.g. PO1>",
+          "bloom": <1-6>,
+          "bloomLabel": "<Remember/Understand/Apply/Analyse/Evaluate/Create>",
+          "date": "<YYYY-MM-DD — assign working day in sequence from startDate skipping weekends>"
+        }
+      ],
+      "cos": ["CO1", "CO2"],
+      "pos": ["PO1", "PO2"]
+    }
+  ],
+  "courseOutcomes": [
+    { "code": "CO1", "statement": "<Use Bloom verb — e.g. Define and explain...>", "bloom": <1-6>, "poCorrel": {"PO1": <0-3>, "PO2": <0-3>} }
+  ]
+}
+
+Rules:
+- Total topic hours per unit must equal unit hours exactly
+- Assign progressive Bloom's levels: early topics L1-L2, mid topics L2-L3, later topics L3-L5, final topics L4-L6
+- Map CO to appropriate PO with correlation 1=Low 2=Medium 3=High
+- Skip Saturdays and Sundays when assigning dates
+- Match topics exactly to the syllabus provided
+- Strictness: ${strictness}
+- Classes per week: ${perWeek}`;
+
+  const unitDistribution=unitHrs.map((h,i)=>`Unit ${i+1}: ${h} hours`).join(', ');
+  const userMsg=`Subject: ${subj?.name||'Unknown'} (${subj?.code||''})
+Total hours: ${totalHrs}
+Number of units: ${numUnits}
+Unit hour distribution: ${unitDistribution}
+Start date: ${startDate}
+End date: ${endDate}
+Classes per week: ${perWeek}
+
+Programme Outcomes to map to:
+${poList}
+
+SYLLABUS:
+${syllabusText||'[See uploaded file]'}`;
+
+  try {
+    let msgContent;
+    if(file){
+      const ext=file.name.split('.').pop().toLowerCase();
+      if(['jpg','jpeg','png','webp'].includes(ext)){
+        const b64=await lpFileToBase64(file);
+        msgContent=[{type:'image',source:{type:'base64',media_type:file.type||'image/jpeg',data:b64}},{type:'text',text:userMsg}];
+      } else if(ext==='pdf'){
+        const b64=await lpFileToBase64(file);
+        msgContent=[{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},{type:'text',text:userMsg}];
+      } else {
+        const txt=await file.text();
+        msgContent=[{type:'text',text:userMsg+'\n\nFILE CONTENT:\n'+txt.slice(0,10000)}];
+      }
+    } else {
+      msgContent=[{type:'text',text:userMsg}];
+    }
+
+    const raw=await callClaude({system:SYSTEM,messages:[{role:'user',content:msgContent}],max_tokens:4000});
+    const result=parseClaudeJSON(raw);
+    if(!result||!result.units) throw new Error('Invalid structure returned');
+
+    aiLPResult={...result,subjId};
+    displayAILessonPlan(result);
+    setStatus('✓ Lesson plan generated — review and click "Approve & load" to save it.','ok');
+
+    /* Show approve button */
+    const approveBtn=document.getElementById('aiLPApproveBtn');
+    if(approveBtn) approveBtn.style.display='';
+
+    /* Reset file */
+    syllabusFileRef=null;
+    document.getElementById('aiSyllabusLabel').textContent='Upload syllabus document';
+    document.getElementById('aiSyllabusFile').value='';
+
+  } catch(err){
+    setStatus('Generation failed: '+err.message,'err');
+    if(resultEl) resultEl.innerHTML='<div style="color:var(--red-dark);font-size:12px;padding:12px">Error: '+err.message+'</div>';
+  }
+}
+
+function displayAILessonPlan(result) {
+  const el=document.getElementById('aiLPResultEl');
+  if(!el)return;
+  const totalTopics=result.units.reduce((a,u)=>a+u.topics.length,0);
+  el.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--slate-900)">${result.subject}</div>
+        <div style="font-size:11px;color:var(--slate-400)">${result.totalHours}h total · ${result.units.length} units · ${totalTopics} topics · ${result.startDate} → ${result.endDate}</div>
+      </div>
+    </div>
+    ${result.units.map((u,ui)=>`
+      <div style="margin-bottom:10px;border:1px solid var(--slate-200);border-radius:var(--r-md);overflow:hidden">
+        <div style="background:var(--slate-800);color:#fff;padding:8px 14px;display:flex;align-items:center;gap:8px">
+          <span style="font-family:'Syne',sans-serif;font-size:11px;font-weight:800">UNIT ${u.unitNo}</span>
+          <span style="font-size:12px;font-weight:600">${u.title}</span>
+          <span style="margin-left:auto;font-size:10px;opacity:.7">${u.hours}h · ${u.topics.length} topics</span>
+        </div>
+        ${u.topics.map((t,ti)=>`
+          <div style="display:grid;grid-template-columns:24px 1fr 50px 60px 60px 70px 88px;gap:6px;padding:7px 10px;border-bottom:1px solid var(--slate-100);font-size:11px;align-items:center;${ti%2===1?'background:var(--slate-50)':''}">
+            <span style="font-size:9px;font-weight:700;color:var(--slate-400);text-align:center">${t.topicNo}</span>
+            <span style="color:var(--slate-700);font-weight:${t.hours>1?'600':'400'}">${t.topic}</span>
+            <span style="color:var(--slate-500);text-align:center">${t.hours}h</span>
+            <span style="background:#ede9fe;color:#5b21b6;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;text-align:center">${t.co||'—'}</span>
+            <span style="background:#dbeafe;color:#1e40af;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;text-align:center">${t.po||'—'}</span>
+            <span class="bloom-badge" style="background:${BLOOM_BG[t.bloom]||'#f3f4f6'};color:${BLOOM_FG[t.bloom]||'#374151'};font-size:9px">L${t.bloom} ${t.bloomLabel||BLOOM_LABELS[t.bloom]||''}</span>
+            <span style="color:var(--slate-400);font-size:10px">${t.date||'—'}</span>
+          </div>`).join('')}
+      </div>`).join('')}
+    ${result.courseOutcomes?.length?`
+      <div style="margin-top:10px;padding:12px 14px;background:#eff6ff;border-radius:var(--r-md)">
+        <div style="font-size:11px;font-weight:700;color:#1e40af;margin-bottom:7px">Generated Course Outcomes</div>
+        ${result.courseOutcomes.map(co=>`
+          <div style="display:flex;gap:8px;margin-bottom:5px;font-size:11px">
+            <span style="font-weight:800;color:#5b21b6;flex-shrink:0;padding:1px 7px;border-radius:4px;background:#ede9fe">${co.code}</span>
+            <span style="color:var(--slate-700)">${co.statement}</span>
+            <span class="bloom-badge" style="background:${BLOOM_BG[co.bloom]||'#f3f4f6'};color:${BLOOM_FG[co.bloom]||'#374151'};flex-shrink:0">L${co.bloom}</span>
+          </div>`).join('')}
+      </div>`:''
+    }`;
+}
+
+function approveAILessonPlan() {
+  if(!aiLPResult){alert('No AI result to approve.');return;}
+  const {subjId,units,courseOutcomes:aiCOs,startDate,endDate}=aiLPResult;
+  /* Load into manual lesson plan */
+  lessonPlans[subjId]={
+    subjId, startDate, endDate,
+    units: units.map(u=>({
+      id:nextLPUnitId++, title:`Unit ${u.unitNo}: ${u.title}`, hours:u.hours,
+      topics:u.topics.map(t=>({
+        id:nextLPTopicId++, topic:t.topic, hours:t.hours,
+        co:t.co||'', po:t.po||'', bloom:String(t.bloom||1), date:t.date||'',
+      })),
+    })),
+  };
+  /* Load COs if not already set */
+  if(aiCOs?.length&&!courseOutcomes[subjId]?.length){
+    courseOutcomes[subjId]=aiCOs.map(co=>({
+      id:nextCOId++, subjId, code:co.code, statement:co.statement,
+      bloom:co.bloom||1, poCorrel:co.poCorrel||{},
+    }));
+  }
+  /* Switch to manual tab with this subject selected */
+  document.getElementById('lpSubject').value=subjId;
+  document.getElementById('lpDept').value=subjects.find(s=>s.id===subjId)?.dept||'BCA';
+  document.getElementById('lpStartDate').value=startDate||'';
+  document.getElementById('lpEndDate').value=endDate||'';
+  pocoTab('manual',document.getElementById('ptab-manual'));
+  renderLessonPlan();
+  updatePOCOStats();
+  alert('✓ AI lesson plan loaded into the Manual tab. Review and save.');
+}
+
+function exportAILessonPlan() {
+  if(!aiLPResult){alert('Generate a lesson plan first.');return;}
+  const {units,subject}=aiLPResult;
+  const rows=[['Unit','Unit Title','#','Topic','Hours','CO','PO','Bloom Level','Bloom Label','Date']];
+  units.forEach((u)=>u.topics.forEach((t)=>rows.push([`Unit ${u.unitNo}`,u.title,t.topicNo,t.topic,t.hours,t.co||'',t.po||'',t.bloom,BLOOM_LABELS[t.bloom]||'',t.date||''])));
+  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([csv],{type:'text/csv'})),download:`ai_lesson_plan_${subject||'subject'}.csv`});
+  a.click();
+}
+
+function lpFileToBase64(file){
+  return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=()=>rej(new Error('FileReader failed'));r.readAsDataURL(file);});
+}
+
+/* ════ CO-PO MATRIX ════ */
+function renderPOCOMatrix() {
+  const el=document.getElementById('pocoMatrixEl');
+  const dept=document.getElementById('matrixDeptPoco')?.value||'BCA';
+  if(!el)return;
+
+  const deptPOs=programmeOutcomes[dept]||[];
+  const deptSubjs=subjects.filter(s=>s.dept===dept);
+  const allCOs=deptSubjs.flatMap(s=>(courseOutcomes[s.id]||[]).map(co=>({...co,subj:s})));
+
+  if(!deptPOs.length||!allCOs.length){
+    el.innerHTML='<div style="font-size:12px;color:var(--slate-400);padding:20px">Define POs (Programme Outcomes tab) and COs (Course Outcomes tab) first.</div>';
+    return;
+  }
+
+  /* Compute avg per CO across POs, and per PO across COs */
+  const html=`<table class="matrix-table">
+    <thead>
+      <tr>
+        <th class="row-header">CO</th>
+        <th class="row-header" style="min-width:180px">Statement</th>
+        <th class="row-header" style="min-width:80px">Subject</th>
+        ${deptPOs.map(po=>`<th title="${po.statement}">${po.code}</th>`).join('')}
+        <th style="background:#374151">Avg</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${allCOs.map(co=>{
+        const levels=deptPOs.map(po=>{
+          const lv=co.poCorrel?.[po.code]||0;
+          return {po,lv};
+        });
+        const avg=levels.reduce((a,x)=>a+x.lv,0)/Math.max(1,levels.filter(x=>x.lv>0).length||1);
+        const avgRound=avg>0?avg.toFixed(1):'—';
+        const avgColor=avg>=2.5?'#065f46':avg>=1.5?'#92400e':'var(--slate-400)';
+        return `<tr>
+          <td class="co-label" style="font-family:monospace;white-space:nowrap">${co.code}</td>
+          <td class="co-label" style="font-size:10px;min-width:180px;font-family:'DM Sans'">${co.statement?.slice(0,60)}${co.statement?.length>60?'…':''}</td>
+          <td style="font-size:10px;color:var(--slate-500)">${co.subj?.code||'—'}</td>
+          ${levels.map(({po,lv})=>`<td>
+            <div class="matrix-level l${lv}" onclick="cycleMatrixCell(${co.id},${co.subj?.id},'${po.code}',this)">${lv||'—'}</div>
+          </td>`).join('')}
+          <td style="font-weight:800;font-family:'Syne',sans-serif;font-size:12px;color:${avgColor};background:${avg>=2.5?'#d1fae5':avg>=1.5?'#fef3c7':'#f3f4f6'}">${avgRound}</td>
+        </tr>`;
+      }).join('')}
+      <!-- Average row -->
+      <tr style="background:var(--slate-800)">
+        <td colspan="3" style="color:#9ca3af;font-size:10px;font-weight:700;padding:7px 10px">AVERAGE</td>
+        ${deptPOs.map(po=>{
+          const vals=allCOs.map(co=>co.poCorrel?.[po.code]||0).filter(v=>v>0);
+          const avg=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
+          const bg=avg>=2.5?'#065f46':avg>=1.5?'#92400e':'#4b5563';
+          return `<td style="text-align:center;font-weight:800;color:#fff;background:${bg};font-family:'Syne',sans-serif;font-size:12px">${avg>0?avg.toFixed(1):'—'}</td>`;
+        }).join('')}
+        <td></td>
+      </tr>
+    </tbody>
+  </table>`;
+  el.innerHTML=html;
+}
+
+function cycleMatrixCell(coId,subjId,poCode,el) {
+  const co=(courseOutcomes[subjId]||[]).find(c=>c.id===coId);
+  if(!co)return;
+  if(!co.poCorrel) co.poCorrel={};
+  const cur=co.poCorrel[poCode]||0;
+  const next=(cur+1)%4;
+  co.poCorrel[poCode]=next;
+  el.className=`matrix-level l${next}`;
+  el.textContent=next||'—';
+  renderPOCOMatrix();
+}
+
+function exportMatrix() {
+  const dept=document.getElementById('matrixDeptPoco')?.value||'BCA';
+  const deptPOs=programmeOutcomes[dept]||[];
+  const allCOs=subjects.filter(s=>s.dept===dept).flatMap(s=>(courseOutcomes[s.id]||[]).map(co=>({...co,subj:s})));
+  const rows=[['CO Code','Statement','Subject',...deptPOs.map(p=>p.code)]];
+  allCOs.forEach(co=>rows.push([co.code,co.statement,co.subj?.code,...deptPOs.map(po=>co.poCorrel?.[po.code]||0)]));
+  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([csv],{type:'text/csv'})),download:`copo_matrix_${dept}.csv`});
+  a.click();
+}
+
+/* ════ DATE-WISE LESSON PLAN ════ */
+function populateLPViewSubject() {
+  const dept=document.getElementById('lpViewDept')?.value||'BCA';
+  const sel=document.getElementById('lpViewSubject');
+  if(!sel)return;
+  sel.innerHTML='<option value="">Select subject…</option>'+subjects.filter(s=>s.dept===dept&&lessonPlans[s.id]).map(s=>`<option value="${s.id}">${s.code} — ${s.name}</option>`).join('');
+}
+
+function renderDatewisePlan() {
+  const el=document.getElementById('datewisePlanEl');
+  const subjId=parseInt(document.getElementById('lpViewSubject')?.value)||null;
+  const filter=document.getElementById('lpViewFilter')?.value||'';
+  if(!el)return;
+  if(!subjId||!lessonPlans[subjId]){
+    el.innerHTML='<div style="font-size:12px;color:var(--slate-400);text-align:center;padding:24px">Select a subject with a saved lesson plan.</div>';
+    return;
+  }
+  const plan=lessonPlans[subjId];
+  const subj=subjects.find(s=>s.id===subjId);
+  const allTopics=plan.units.flatMap((u,ui)=>
+    u.topics.map(t=>({...t,unitNo:ui+1,unitTitle:u.title,unitColor:['#dbeafe','#ede9fe','#d1fae5','#fef3c7','#fee2e2'][ui%5]}))
+  ).filter(t=>!filter||`unit${t.unitNo}`===filter).sort((a,b)=>(a.date||'9999')>(b.date||'9999')?1:-1);
+
+  const total=allTopics.length;
+  const mapped=allTopics.filter(t=>t.co).length;
+  const classNo={};
+  let n=0;
+  allTopics.forEach(t=>{for(let i=0;i<(t.hours||1);i++){n++;classNo[`${t.id}_${i}`]=n;}});
+
+  /* Group by unit for header display */
+  let lastUnit='';
+  const rows=allTopics.map(t=>{
+    const rows2=[];
+    const num=classNo[`${t.id}_0`];
+    if(t.unitTitle!==lastUnit){
+      lastUnit=t.unitTitle;
+      rows2.push(`<div style="background:var(--slate-800);color:#fff;padding:7px 14px;font-size:11px;font-weight:700;letter-spacing:.04em">Unit ${t.unitNo} — ${t.unitTitle}</div>`);
+    }
+    const bBg=BLOOM_BG[parseInt(t.bloom)]||'#f3f4f6';
+    const bFg=BLOOM_FG[parseInt(t.bloom)]||'#374151';
+    rows2.push(`<div class="lp-date-row">
+      <span class="lp-date-badge">${t.date||'Unscheduled'}</span>
+      <span style="font-size:9px;font-weight:700;color:var(--slate-400);min-width:26px">C${num}</span>
+      <div style="width:5px;height:24px;border-radius:2px;background:${t.unitColor};flex-shrink:0"></div>
+      <span style="font-size:12px;color:var(--slate-800);flex:1;${t.hours>1?'font-weight:600':''}">${t.topic||'<em style="color:var(--slate-300)">Topic not named</em>'}</span>
+      ${t.hours>1?`<span style="font-size:9px;color:var(--slate-400);background:var(--slate-100);padding:1px 6px;border-radius:4px">${t.hours}h</span>`:''}
+      <span class="lp-co-tag">${t.co||'—'}</span>
+      <span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;background:#dbeafe;color:#1e40af;flex-shrink:0">${t.po||'—'}</span>
+      <span class="lp-bloom-tag" style="background:${bBg};color:${bFg}">L${t.bloom} ${BLOOM_LABELS[parseInt(t.bloom)]||''}</span>
+    </div>`);
+    return rows2.join('');
+  }).join('');
+
+  el.innerHTML=`
+    <div style="padding:12px 16px;border-bottom:2px solid var(--slate-200);background:var(--slate-50);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--slate-900)">${subj?.name||'—'}</div>
+      <div style="font-size:11px;color:var(--slate-400)">${plan.startDate||'—'} → ${plan.endDate||'—'} · ${total} topics · ${mapped}/${total} CO-mapped</div>
+    </div>
+    <div style="display:grid;grid-template-columns:80px 28px 6px 1fr auto 60px 50px 100px;gap:6px;padding:6px 14px;background:var(--slate-100);font-size:9px;font-weight:700;color:var(--slate-400);text-transform:uppercase;letter-spacing:.05em">
+      <div>Date</div><div>Class</div><div></div><div>Topic</div><div></div><div>CO</div><div>PO</div><div>Bloom</div>
+    </div>
+    ${rows}`;
+}
+
+function printLessonPlan() {
+  alert('Print lesson plan — in the full system this generates a formatted PDF with:\n· College header\n· Subject details\n· Date-wise class plan\n· CO-PO mapping per topic\n· Principal signature');
+}
+
+/* ── Init ── */
+function initPOCOModule() {
+  const dept='BCA';
+  if(!(programmeOutcomes[dept]?.length)) loadDefaultPOs();
+  populateCOSubjectFilter();
+  populateLPSubjectFilter();
+  populateAILPSubjectFilter();
+  populateLPViewSubject();
+  updatePOCOStats();
+}
 /* ════════════════════════════
    VALUATION MODULE
 ════════════════════════════ */
@@ -6699,7 +8015,7 @@ let nextSEEId     = 1;
 let nextQBId      = 1;
 let editingQBId   = null;
 
-const BLOOM_LABELS = { 1:'Remember', 2:'Understand', 3:'Apply', 4:'Analyse', 5:'Evaluate', 6:'Create' };
+/* BLOOM_LABELS declared globally in PO-CO module */
 const BLOOM_COLORS = { 1:'#dbeafe', 2:'#ede9fe', 3:'#d1fae5', 4:'#fef3c7', 5:'#fee2e2', 6:'#fce7f3' };
 const BLOOM_TEXT   = { 1:'#1e40af', 2:'#5b21b6', 3:'#065f46', 4:'#92400e', 5:'#991b1b', 6:'#9d174d' };
 const GRADE_TABLE  = [
@@ -11966,7 +13282,6 @@ function sendMessage() {
 document.addEventListener('DOMContentLoaded', function() {
   if (typeof initApiKeyBanner  === 'function') initApiKeyBanner();
   if (typeof updateDeptStats   === 'function') updateDeptStats();
-  if (typeof updateTeacherStats=== 'function') updateTeacherStats();
   if (typeof renderTeacherList === 'function') renderTeacherList();
   if (typeof updateStudentStats=== 'function') updateStudentStats();
 });
